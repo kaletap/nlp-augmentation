@@ -115,7 +115,7 @@ class BlurrPipeline:
         return cls(learn, exp_parameters)
 
     @classmethod
-    def load_data(cls, dataset, train_samples, df_train, train_samples):
+    def load_data(cls, dataset, train_samples):
         data_train = datasets.load_dataset(dataset, split="train")  # setup correctly train, valid and test
         data_test = datasets.load_dataset(dataset, split="test")
         df_train = pd.DataFrame(data_train)
