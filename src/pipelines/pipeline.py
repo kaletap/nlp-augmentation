@@ -39,12 +39,12 @@ class BlurrPipeline:
         unfrozen_epochs = params["epochs"].pop(0)
         lr = self.learn.lr_find(suggestions=True).lr_min
         self.learn.fit_one_cycle(unfrozen_epochs, lr_max=lr)
-        for epoch, unfreeze, lr_fn, moms in zip(params.values()):
+        for epoch, unfreeze, lr_fn in zip(params.values()):
             if unfreeze == "all":
                 self.learn.unfreeze()
             else:
                 self.learn.freeze_to(unfreeze)
-            self.learn.fit_one_cycle(epoch, lr_max=lr_fn(lr), moms=moms)
+            self.learn.fit_one_cycle(epoch, lr_max=lr_fn(lr))
 
     def save_model(self):
         self.learn.export(fname=self.parameters["model_save_paths"])

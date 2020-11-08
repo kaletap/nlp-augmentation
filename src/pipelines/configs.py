@@ -35,7 +35,7 @@ summary_bart_config = {
             "epochs": [2, 1, 1],
             "unfreeze": [-3, "all"]},
             "lr": [lambda x: x / 10, lambda x: slice(x / 1000, x / 100)],
-            "moms": [(0.8, 0.7), (0.8, 0.7)], # [None, None]
+            # "moms": [(0.8, 0.7), (0.8, 0.7)], # [None, None]
         },
     }
 }
