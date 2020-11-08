@@ -36,7 +36,8 @@ class BlurrPipeline:
 
     def train(self):
         params = self.parameters["train_params"][self.parameters["train_samples"]]
-        unfrozen_epochs = params["epochs"].pop(0)
+        unfrozen_epochs = params["epochs"][0]
+        params["epochs"] = params["epochs"][1:]
         lr = self.learn.lr_find(suggestions=True).lr_min
         self.learn.fit_one_cycle(unfrozen_epochs, lr_max=lr)
         for epoch, unfreeze, lr_fn in zip(params.values()):
