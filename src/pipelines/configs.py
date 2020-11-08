@@ -58,7 +58,7 @@ qa_bert_config = {
         {"all": {
             "epochs": [2, 1, 1],
             "unfreeze": [-3, "all"]},
-            "lr": [lambda x: x/10, lambda x: slice(x/1000, x/100)],
+            "lr": [lr_getter(10, 1), lr_getter(100, 10)],
             # "moms": [(0.8, 0.7), (0.8, 0.7)]
         },
         # {1000: {"epochs": [3, 2, 1], "unfreeze": [False, True, True], "lr": [lambda x:x, lambda x:slice(x/1000, x/100)]}},

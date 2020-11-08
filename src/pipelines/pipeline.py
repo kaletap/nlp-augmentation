@@ -116,7 +116,7 @@ class BlurrPipeline:
 
     @classmethod
     def load_data(cls, dataset, train_samples):
-        data_train = datasets.load_dataset(dataset, split="train")  # setup correctly train, valid and test
+        data_train = datasets.load_dataset(dataset, split="train")
         data_test = datasets.load_dataset(dataset, split="test")
         df_train = pd.DataFrame(data_train)
         df_test = pd.DataFrame(data_test)
@@ -217,7 +217,7 @@ class SummarizationPipeline(BlurrPipeline):
     def get_databunch_from_name(cls, ds, aug_fn, arch, tokenizer, params):
         # load data
         df = cls.load_data(ds, params["train_samples"])
-        processed_df = data_processing.processing_from_name(df, ds, arch, tokenizer)
+        processed_df = data_processing.processing_from_name(df, ds, arch, tokenizer, params["max_len"])
 
         # convert to datablock (dataset specific fragment?)
         hf_batch_tfm = model_sum.HF_SummarizationBatchTransform(
