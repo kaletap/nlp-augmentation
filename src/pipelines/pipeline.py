@@ -115,12 +115,12 @@ class BlurrPipeline:
         return cls(learn, exp_parameters)
 
     @classmethod
-    def load_data(cls, dataset, train_samples):
+    def load_data(cls, dataset, train_samples, df_train, train_samples):
         data_train = datasets.load_dataset(dataset, split="train")  # setup correctly train, valid and test
         data_test = datasets.load_dataset(dataset, split="test")
         df_train = pd.DataFrame(data_train)
         df_test = pd.DataFrame(data_test)
-        if train_samples:
+        if isinstance(train_samples, int):
             df_train = df_train[:train_samples]
             assert len(df_train) == train_samples, \
                 f"Dataset is too small to return requested train sample count {train_samples}"
