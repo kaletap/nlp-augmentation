@@ -7,11 +7,6 @@ from blurr.modeling import question_answering as model_qa
 
 from src.pipelines import pipeline
 
-def lr_getter(div1, div2):
-    def get_lr(lr):
-        return slice(lr / div1, lr / div2)
-    return get_lr
-
 gigaword_config = {
     "ds_name": "gigaword",
     "max_len": (256, 130),
@@ -39,7 +34,7 @@ summary_bart_config = {
         {10000: {
             "epochs": [2, 1, 1],
             "unfreeze": [-3, "all"]},
-            "lr": (lr_getter(10, 1), lr_getter(100, 10)),
+            "lr": ((10, 1), (100, 10)),
             # "moms": [(0.8, 0.7), (0.8, 0.7)], # [None, None]
         },
     }
@@ -58,7 +53,7 @@ qa_bert_config = {
         {"all": {
             "epochs": (2, 1, 1),
             "unfreeze": (-3, "all")},
-            "lr": (lr_getter(10, 1), lr_getter(100, 10)),
+            "lr": ((10, 1), (100, 10)),
             # "moms": [(0.8, 0.7), (0.8, 0.7)]
         },
         # {1000: {"epochs": [3, 2, 1], "unfreeze": [False, True, True], "lr": [lambda x:x, lambda x:slice(x/1000, x/100)]}},

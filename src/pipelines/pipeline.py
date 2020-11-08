@@ -23,6 +23,11 @@ from src.augmentation import augmentations
 # implement nlp aug
 
 
+def get_lr(lr, div1, div2):
+    return slice(lr / div1, lr / div2)
+
+
+
 class BlurrPipeline:
     def __init__(self, learn, parameters):
         self.learn = learn
@@ -40,12 +45,12 @@ class BlurrPipeline:
         params["epochs"] = params["epochs"][1:]
         lr = self.learn.lr_find(suggestions=True).lr_min
         self.learn.fit_one_cycle(unfrozen_epochs, lr_max=lr)
-        for epoch, unfreeze, lr_fn in zip(params.values()):
+        for epoch, unfreeze, lr_divs in zip(params.values()):
             if unfreeze == "all":
                 self.learn.unfreeze()
             else:
                 self.learn.freeze_to(unfreeze)
-            self.learn.fit_one_cycle(epoch, lr_max=lr_fn(lr))
+            self.learn.fit_one_cycle(epoch, lr_max=get_lr(lr, lr_divs[0],  lr_divs[1]))
 
     def save_model(self):
         self.learn.export(fname=self.parameters["model_save_paths"])
