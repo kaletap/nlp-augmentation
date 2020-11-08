@@ -2,7 +2,8 @@ from functools import partial
 
 from fastai import optimizer
 import transformers
-from blurr import modeling as blurr_model
+from blurr.modeling import summarization as model_sum
+from blurr.modeling import question_answering as model_qa
 
 from src.pipelines import pipeline
 
@@ -25,7 +26,7 @@ summary_bart_config = {
     "model_class": transformers.BartForConditionalGeneration,
     "task": "summarization",
     "opt_func": optimizer.ranger,
-    "loss_func": blurr_model.summarization.HF_MaskedLMLoss(),
+    "loss_func": model_sum.HF_MaskedLMLoss(),
     "metrics": [],
     "bs": 8,
     "pre_config_overwrite": {'max_length': 130, 'min_length': 30},
@@ -44,7 +45,7 @@ qa_bert_config = {
     "model_class": transformers.BertForQuestionAnswering,
     "task": "qa",
     "opt_func": partial(optimizer.Adam, decouple_wd=True),
-    "loss_func": blurr_model.question_anwsering.MultiTargetLoss(),
+    "loss_func": model_qa.MultiTargetLoss(),
     "metrics": [],
     "bs": 8,
     "pre_config_overwrite": {},

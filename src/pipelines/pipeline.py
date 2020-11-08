@@ -7,9 +7,12 @@ from fastai import imports
 from fastai import learner
 from fastai.callback import progress
 from fastai.data import block, transforms
-from blurr import data as blurr_data
-from blurr import modeling as blurr_model
 from blurr import utils
+
+from blurr.modeling import summarization as model_sum
+from blurr.data import question_answering as data_qa
+from blurr.data import core as data_core
+from blurr.modeling import core as model_core
 
 from src.data_processing import data_processing
 from src.augmentation import augmentations
@@ -134,7 +137,7 @@ class BlurrPipeline:
 
     @classmethod
     def get_learner(cls, databunch, arch, pre_model, pre_config, config):
-        model = blurr_model.core.HF_BaseModelWrapper(pre_model)
+        model = model_core.HF_BaseModelWrapper(pre_model)
         model_cb = cls.get_callbacks(pre_config, config["pre_config_overwrite"])
         model_cb = model_cb + [progress.CSVLogger]
         splitter = cls.get_splitter(arch)
@@ -160,7 +163,7 @@ class BlurrPipeline:
 class QuestionAnsweringPipeline(BlurrPipeline):
     @classmethod
     def get_splitter(cls, arch, **kwargs):
-        return blurr_model.core.hf_splitter
+        return model_core.hf_splitter
 
     @classmethod
     def get_callbacks(cls, pre_config, config):
@@ -173,13 +176,13 @@ class QuestionAnsweringPipeline(BlurrPipeline):
         processed_df = data_processing.processing_from_name(df, ds, arch, tokenizer, params["max_len"])
 
         trunc_strat = 'only_second' if (tokenizer.padding_side == 'right') else 'only_first'
-        hf_batch_tfm = blurr_data.question_answering.HF_QABatchTransform(arch, tokenizer,
+        hf_batch_tfm = data_qa.HF_QABatchTransform(arch, tokenizer,
                                            max_length=params["max_len"],
                                            truncation=trunc_strat,
                                            tok_kwargs={'return_special_tokens_mask': True})
 
         blocks = (
-            blurr_data.core.HF_TextBlock(hf_batch_tfm=hf_batch_tfm),
+            data_core.HF_TextBlock(hf_batch_tfm=hf_batch_tfm),
             block.CategoryBlock(vocab=vocab),
             block.CategoryBlock(vocab=vocab)
         )
@@ -202,12 +205,12 @@ class QuestionAnsweringPipeline(BlurrPipeline):
 class SummarizationPipeline(BlurrPipeline):
     @classmethod
     def get_splitter(cls, arch, **kwargs):
-        return partial(blurr_model.summarization.summarization_splitter, arch=arch)
+        return partial(model_sum.summarization_splitter, arch=arch)
 
     @classmethod
     def get_callbacks(cls, pre_config, config):
         text_gen_kwargs = {**pre_config.task_specific_params['summarization'], **config}
-        model_cb = blurr_model.summarization.HF_SummarizationModelCallback(text_gen_kwargs=text_gen_kwargs)
+        model_cb = model_sum.HF_SummarizationModelCallback(text_gen_kwargs=text_gen_kwargs)
         return [model_cb]
 
     @classmethod
@@ -217,12 +220,12 @@ class SummarizationPipeline(BlurrPipeline):
         processed_df = data_processing.processing_from_name(df, ds, arch, tokenizer)
 
         # convert to datablock (dataset specific fragment?)
-        hf_batch_tfm = blurr_data.summarization.HF_SummarizationBatchTransform(
+        hf_batch_tfm = model_sum.HF_SummarizationBatchTransform(
             arch,
             tokenizer,
             max_length=params["max_len"]
         )
-        blocks = (blurr_data.core.HF_TextBlock(hf_batch_tfm=hf_batch_tfm), imports.noop)
+        blocks = (data_core.HF_TextBlock(hf_batch_tfm=hf_batch_tfm), imports.noop)
 
         # update ColReader with augmentation technique
         dblock = block.DataBlock(blocks=blocks,
