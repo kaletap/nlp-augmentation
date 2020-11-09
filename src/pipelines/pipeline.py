@@ -126,7 +126,7 @@ class BlurrPipeline:
         data_test = datasets.load_dataset(dataset, split="test")
         df_train = pd.DataFrame(data_train)
         df_test = pd.DataFrame(data_test)
-        if train_samples:
+        if train_samples != "all":
             df_train = df_train[:train_samples]
             assert len(df_train) == train_samples, \
                 f"Dataset is too small to return requested train sample count {train_samples}"
@@ -232,10 +232,11 @@ class SummarizationPipeline(BlurrPipeline):
             max_length=params["max_len"]
         )
         blocks = (data_core.HF_TextBlock(hf_batch_tfm=hf_batch_tfm), imports.noop)
+        get_x = aug_fn(params["x_col"])
 
         # update ColReader with augmentation technique
         dblock = block.DataBlock(blocks=blocks,
-                           get_x=aug_fn(params["x_col"]),#transforms.ColReader
+                           get_x=get_x,
                            get_y=transforms.ColReader(params["y_col"]),
                            splitter=transforms.ColSplitter(col="is_valid"))
 
