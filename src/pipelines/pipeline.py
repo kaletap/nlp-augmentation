@@ -193,6 +193,8 @@ class QuestionAnsweringPipeline(BlurrPipeline):
             block.CategoryBlock(vocab=vocab)
         )
 
+        get_x = aug_fn(params["x_col"])
+
         def get_x(x):
             return (x.question, x.context) if (tokenizer.padding_side == 'right') else (x.context, x.question)
 
