@@ -78,7 +78,7 @@ experiments_setup = {
     "augmentations": ("no_aug",),# "vae", "rules", "style_transfer"],
     "seeds": (1990,),# 9, 11, 21, 37]
     "tasks": {
-        "summarization": ((pipeline.QuestionAnsweringPipeline, {**summary_bart_config, **gigaword_config, **common_config})),
-        "qa": ((pipeline.SummarizationPipeline, {**qa_bert_config, **squad_v2_config, **common_config}))
+        "summarization": ((pipeline.SummarizationPipeline, {**summary_bart_config, **gigaword_config, **common_config})),
+        "qa": ((pipeline.QuestionAnsweringPipeline, {**qa_bert_config, **squad_v2_config, **common_config}))
     }
 }
