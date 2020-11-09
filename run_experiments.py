@@ -16,7 +16,7 @@ def fill_paths(task, train_samples, aug, seed, config):
 
 
 def run_exp(task, main_config):
-    pipe_cls, config = main_config["task"][task]
+    pipe_cls, config = main_config["tasks"][task]
     for aug in main_config["augmentations"]:
         config["augmentation"] = aug
         for train_samples in main_config["train_samples"]:
