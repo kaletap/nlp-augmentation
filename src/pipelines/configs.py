@@ -74,9 +74,9 @@ common_config = {
 }
 
 experiments_setup = {
-    "train_samples": (False), #[10, 100, 1000, 10000],
+    "train_samples": tuple(False), #[10, 100, 1000, 10000],
     "augmentations": ("no_aug"),# "vae", "rules", "style_transfer"],
-    "seeds": (1990),# 9, 11, 21, 37]
+    "seeds": tuple(1990),# 9, 11, 21, 37]
     "tasks": {
         "summarization": ((pipeline.QuestionAnsweringPipeline, {**summary_bart_config, **gigaword_config, **common_config})),
         "qa": ((pipeline.SummarizationPipeline, {**qa_bert_config, **squad_v2_config, **common_config}))
