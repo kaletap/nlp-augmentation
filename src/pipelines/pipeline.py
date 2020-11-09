@@ -93,7 +93,7 @@ class BlurrPipeline:
     @classmethod
     def get_augmentation_fn(cls, aug_name):
         if aug_name == "no_aug":
-            return augmentations.NoAug
+            return transforms.ColReader
         else:
             raise ValueError(f"{aug_name} is not a supported augmentation mode")
 
