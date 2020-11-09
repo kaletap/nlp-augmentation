@@ -132,7 +132,7 @@ class BlurrPipeline:
                 f"Dataset is too small to return requested train sample count {train_samples}"
         df_train["is_valid"] = False
         df_test["is_valid"] = True
-        df = pd.stack([df_train, df_test])
+        df = pd.concat([df_train, df_test])
         return df
 
     @classmethod
