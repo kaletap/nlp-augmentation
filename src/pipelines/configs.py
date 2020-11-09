@@ -10,15 +10,15 @@ from src.pipelines import pipeline
 gigaword_config = {
     "ds_name": "gigaword",
     "max_len": (256, 130),
-    "x_col": "",
-    "y_col": "",
+    "x_col": "document",
+    "y_col": "summary",
 }
 
 squad_v2_config = {
     "ds_name": "squad_v2",
     "max_len": 256,
-    "x_col": "",
-    "y_col": "",
+    "x_col": ("question", "context"),
+    "y_col": ("tok_answer_start", "tok_answer_end"),
 }
 
 summary_bart_config = {

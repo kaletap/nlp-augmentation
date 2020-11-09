@@ -193,12 +193,13 @@ class QuestionAnsweringPipeline(BlurrPipeline):
             block.CategoryBlock(vocab=vocab)
         )
 
-        get_x = aug_fn(params["x_col"])
+        get_question_auged = aug_fn(params["x_col"][0])
+        get_context_auged = aug_fn(params["x_col"][1])
 
         def get_x(x):
-            return (x.question, x.context) if (tokenizer.padding_side == 'right') else (x.context, x.question)
-
-        # get_x=aug_fn(params["x_col"]),#transforms.ColReader
+            return (get_question_auged(x), get_context_auged(x)) \
+                if (tokenizer.padding_side == 'right') \
+                else (get_context_auged(x), get_question_auged(x))
 
         dblock = block.DataBlock(blocks=blocks,
                            get_x=get_x,
