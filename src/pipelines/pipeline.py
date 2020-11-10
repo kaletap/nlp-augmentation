@@ -147,7 +147,7 @@ class BlurrPipeline:
         model = model_core.HF_BaseModelWrapper(pre_model)
         model_cb = cls.get_callbacks(pre_config, config["pre_config_overwrite"])
         print(config)
-        save_path = config["metrics_save_path"]
+        save_path = config["metrics_save_paths"]
         model_cb = model_cb + [partial(progress.CSVLogger, filename=save_path)]
         splitter = cls.get_splitter(arch)
         learn = learner.Learner(
