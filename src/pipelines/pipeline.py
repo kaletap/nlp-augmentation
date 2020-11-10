@@ -16,7 +16,7 @@ from blurr.modeling import core as model_core
 
 from src.data_processing import data_processing
 from src.augmentation import augmentations
-from src import utils
+from src import training_utils
 
 # TODO
 # adding custom metrics for qa
@@ -47,7 +47,7 @@ class BlurrPipeline:
                 self.learn.unfreeze()
             else:
                 self.learn.freeze_to(unfreeze)
-            self.learn.fit_one_cycle(epoch, lr_max=utils.get_lr(lr, lr_divs[0],  lr_divs[1]))
+            self.learn.fit_one_cycle(epoch, lr_max=training_utils.get_lr(lr, lr_divs[0],  lr_divs[1]))
 
     def save_model(self):
         print("saving model started")
