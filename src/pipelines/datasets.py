@@ -16,9 +16,11 @@ class DatasetWithAugmentation(Dataset):
             try:
                 item['text'] = self.augmenter(item['text'])
             except:
+                print(f"Something went wrong when augmenting item number {i}")
                 print(item)
-                raise Exception(f"Something went wrong when augmenting item number {i}")
-        return item
+                return item
+        else:
+            return item
 
     def __len__(self):
         return len(self.dataset)
@@ -29,6 +31,7 @@ def get_datasets(dataset_name, augmenter=None, train_size=10_000, val_size=5_000
     """
     Returns a tuple of train, validation and test datasets of sizes determined by arguments.
     If load_test is False, test_size has to be specified.
+    Random seeds are set in order to get the same validation and test sets in every experiment."
     """
     dataset = load_dataset(dataset_name, split="train")
     # We want test and validation data to be the same for every experiment
