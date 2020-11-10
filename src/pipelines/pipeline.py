@@ -130,8 +130,6 @@ class BlurrPipeline:
 
     @classmethod
     def load_data(cls, dataset, train_samples):
-        import pdb;
-        pdb.set_trace()
         data_train = datasets.load_dataset(dataset, split="train")
         data_test = datasets.load_dataset(dataset, split="validation")
         df_train = pd.DataFrame(data_train)
@@ -208,10 +206,13 @@ class QuestionAnsweringPipeline(BlurrPipeline):
         get_question_auged = aug_fn(params["x_col"][0])
         get_context_auged = aug_fn(params["x_col"][1])
 
+        # def get_x(x):
+        #     return (get_question_auged(x), get_context_auged(x)) \
+        #         if (tokenizer.padding_side == 'right') \
+        #         else (get_context_auged(x), get_question_auged(x))
+
         def get_x(x):
-            return (get_question_auged(x), get_context_auged(x)) \
-                if (tokenizer.padding_side == 'right') \
-                else (get_context_auged(x), get_question_auged(x))
+            return (x.question, x.context) if (tokenizer.padding_side == 'right') else (x.context, x.question)
 
         dblock = block.DataBlock(blocks=blocks,
                            get_x=get_x,
