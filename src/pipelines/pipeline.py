@@ -92,7 +92,7 @@ class BlurrPipeline:
     def get_splitter(cls, arch, **kwargs):
         pass
 
-    # @classmethod
+    @classmethod
     def from_name(cls, exp_parameters):
         # will experiment abstraction be needed or exp_result class is enough
         # exp_parameters = add_env_vars(exp_parameters) # chyba blurr sam organie czy gpu etc.
