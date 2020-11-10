@@ -29,5 +29,5 @@ def run_exp(task, main_config):
 
 
 if __name__ == "__main__":
-    # run_exp(task="qa", main_config=configs.experiments_setup)
-    run_exp(task="summarization", main_config=configs.experiments_setup)
+    run_exp(task="qa", main_config=configs.experiments_setup)
+    # run_exp(task="summarization", main_config=configs.experiments_setup)
