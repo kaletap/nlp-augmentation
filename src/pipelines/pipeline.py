@@ -100,7 +100,7 @@ class BlurrPipeline:
         aug_fn = cls.get_augmentation_fn(exp_parameters["augmentation"])
         print(f"augmentation {exp_parameters['augmentation']} loaded")
         arch, config, tokenizer, model = cls.get_model_from_name(model_name, model_class)
-        print(f"model_name:{model_name} loaded")
+        print(f"model {model_name} loaded")
         databunch = cls.get_databunch_from_name(
             ds=exp_parameters["ds_name"],
             aug_fn=aug_fn,
@@ -108,7 +108,7 @@ class BlurrPipeline:
             tokenizer=tokenizer,
             params=exp_parameters,
         )
-        print(f"dataset :{exp_parameters['ds_name']} loaded")
+        print(f"dataset {exp_parameters['ds_name']} loaded")
         learn = cls.get_learner(
             arch=arch,
             pre_model=model,
