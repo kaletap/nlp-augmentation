@@ -99,7 +99,6 @@ class BlurrPipeline:
         print(f"augmentation {exp_parameters['augmentation']} loaded")
         arch, config, tokenizer, model = cls.get_model_from_name(model_name, model_class)
         print(f"model_name:{model_name} loaded")
-        import pdb;pdb.set_trace()
         databunch = cls.get_databunch_from_name(
             ds=exp_parameters["ds_name"],
             aug_fn=aug_fn,
@@ -233,6 +232,8 @@ class SummarizationPipeline(BlurrPipeline):
     @classmethod
     def get_databunch_from_name(cls, ds, aug_fn, arch, tokenizer, params):
         # load data
+        import pdb;
+        pdb.set_trace()
         df = cls.load_data(ds, params["train_samples"])
         processed_df = data_processing.processing_from_name(df, ds, arch, tokenizer, params["max_len"])
 
