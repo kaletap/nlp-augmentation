@@ -145,20 +145,23 @@ class BlurrPipeline:
 
     @classmethod
     def get_learner(cls, databunch, arch, pre_model, pre_config, config):
-        import pdb;pdb.set_trace()
         model = model_core.HF_BaseModelWrapper(pre_model)
         model_cb = cls.get_callbacks(pre_config, config["pre_config_overwrite"])
-        # model_cb = model_cb + [progress.CSVLogger]
+        # if model_cb is None:
+        #     model_cb = [progress.CSVLogger]
+        # else:
+        #     model_cb = model_cb + [progress.CSVLogger]
         splitter = cls.get_splitter(arch)
         learn = learner.Learner(
             databunch,
             model,
             opt_func=config["opt_func"],
-            loss_func=config["loss_func"](),
+            #loss_func=config["loss_func"](),
             cbs=model_cb,
             splitter=splitter,
         )
-        learn = cls.add_custom_metrics(learn, config["metrics"])
+        # learn = cls.add_custom_metrics(learn, config["metrics"])
+        learn.loss_func = config["loss_func"]()
         learn.create_opt()
         learn.freeze()
         return learn
@@ -184,7 +187,7 @@ class QuestionAnsweringPipeline(BlurrPipeline):
 
     @classmethod
     def get_callbacks(cls, pre_config, config):
-        return []
+        return None
 
     @classmethod
     def get_databunch_from_name(cls, ds, aug_fn, arch, tokenizer, params):
