@@ -128,7 +128,7 @@ class BlurrPipeline:
     @classmethod
     def load_data(cls, dataset, train_samples):
         data_train = datasets.load_dataset(dataset, split="train")
-        data_test = datasets.load_dataset(dataset, split="test")
+        data_test = datasets.load_dataset(dataset, split="validation")
         df_train = pd.DataFrame(data_train)
         df_test = pd.DataFrame(data_test)
         if train_samples != "all":
