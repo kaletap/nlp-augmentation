@@ -50,7 +50,7 @@ qa_bert_config = {
     "bs": 8,
     "pre_config_overwrite": {},
     "train_params": {
-        1000: {
+        "all": {
             "epochs": (2, 1, 1),
             "unfreeze": (-3, "all"),
             "lr": ((10, 1), (100, 10)),

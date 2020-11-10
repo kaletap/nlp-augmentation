@@ -43,8 +43,9 @@ class BlurrPipeline:
         params["epochs"] = params["epochs"][1:]
 
         lr = self.learn.lr_find().lr_min
-        self.learn.fit_one_cycle(unfrozen_epochs, lr_max=lr)
+        # self.learn.fit_one_cycle(unfrozen_epochs, lr_max=lr)
         for epoch, unfreeze, lr_divs in zip(params.values()):
+            import pdb;pdb.set_trace()
             if unfreeze == "all":
                 self.learn.unfreeze()
             else:
