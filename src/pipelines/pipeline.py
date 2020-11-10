@@ -92,7 +92,7 @@ class BlurrPipeline:
     def get_splitter(cls, arch, **kwargs):
         pass
 
-    @classmethod
+    # @classmethod
     def from_name(cls, exp_parameters):
         # will experiment abstraction be needed or exp_result class is enough
         # exp_parameters = add_env_vars(exp_parameters) # chyba blurr sam organie czy gpu etc.
@@ -109,16 +109,16 @@ class BlurrPipeline:
             tokenizer=tokenizer,
             params=exp_parameters,
         )
-        # print(f"dataset :{exp_parameters['ds_name']} loaded")
-        # learn = cls.get_learner(
-        #     arch=arch,
-        #     pre_model=model,
-        #     pre_config=config,
-        #     config=exp_parameters,
-        #     databunch=databunch
-        # )
-        # print(f"learner setup finished")
-        return cls(databunch, exp_parameters)
+        print(f"dataset :{exp_parameters['ds_name']} loaded")
+        learn = cls.get_learner(
+            arch=arch,
+            pre_model=model,
+            pre_config=config,
+            config=exp_parameters,
+            databunch=databunch
+        )
+        print(f"learner setup finished")
+        return cls(learn, exp_parameters)
 
     @classmethod
     def get_model_from_name(cls, pretrained_model_name, model_class):
@@ -145,15 +145,16 @@ class BlurrPipeline:
 
     @classmethod
     def get_learner(cls, databunch, arch, pre_model, pre_config, config):
+        import pdb;pdb.set_trace()
         model = model_core.HF_BaseModelWrapper(pre_model)
         model_cb = cls.get_callbacks(pre_config, config["pre_config_overwrite"])
-        model_cb = model_cb + [progress.CSVLogger]
+        # model_cb = model_cb + [progress.CSVLogger]
         splitter = cls.get_splitter(arch)
         learn = learner.Learner(
             databunch,
             model,
             opt_func=config["opt_func"],
-            loss_func=config["loss_func"],
+            loss_func=config["loss_func"](),
             cbs=model_cb,
             splitter=splitter,
         )
@@ -203,8 +204,8 @@ class QuestionAnsweringPipeline(BlurrPipeline):
             block.CategoryBlock(vocab=vocab)
         )
 
-        get_question_auged = aug_fn(params["x_col"][0])
-        get_context_auged = aug_fn(params["x_col"][1])
+        # get_question_auged = aug_fn(params["x_col"][0])
+        # get_context_auged = aug_fn(params["x_col"][1])
 
         # def get_x(x):
         #     return (get_question_auged(x), get_context_auged(x)) \
