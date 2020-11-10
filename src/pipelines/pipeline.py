@@ -25,6 +25,8 @@ from src import training_utils
 # implement nlp aug
 
 
+
+
 class BlurrPipeline:
     def __init__(self, learn, parameters):
         self.learn = learn
@@ -205,14 +207,17 @@ class QuestionAnsweringPipeline(BlurrPipeline):
         get_question_auged = aug_fn(params["x_col"][0])
         get_context_auged = aug_fn(params["x_col"][1])
 
-        def get_x(x):
-            return (get_question_auged(x), get_context_auged(x)) \
-                if (tokenizer.padding_side == 'right') \
-                else (get_context_auged(x), get_question_auged(x))
+
+        get_x = partial(
+            training_utils.get_qa_x,
+            aug_question_fn=get_question_auged,
+            aug_context_fn=get_context_auged,
+            tokenizer=tokenizer
+        )
 
         dblock = block.DataBlock(blocks=blocks,
                            get_x=get_x,
-                           get_y=[transforms.ColReader('tok_answer_start'), transforms.ColReader('tok_answer_end')],
+                           get_y=[transforms.ColReader(params["y_col"][0]), transforms.ColReader(params["y_col"][1])],
                            splitter=transforms.ColSplitter(col="is_valid"),
                            n_inp=1)
 
