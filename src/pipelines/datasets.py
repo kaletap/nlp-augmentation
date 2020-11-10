@@ -24,7 +24,8 @@ class DatasetWithAugmentation(Dataset):
         return len(self.dataset)
 
 
-def get_datasets(dataset_name, augmenter=None, train_size=10_000, val_size=5_000, test_size=None, augmentation_prob=0.7, random_seed: int = 42, load_test=False):
+def get_datasets(dataset_name, augmenter=None, train_size=10_000, val_size=5_000, test_size=None, augmentation_prob=0.7,
+                 random_seed: int = 42, load_test=False, filter_func=None):
     """
     Returns a tuple of train, validation and test datasets of sizes determined by arguments.
     If load_test is False, test_size has to be specified.
@@ -40,6 +41,11 @@ def get_datasets(dataset_name, augmenter=None, train_size=10_000, val_size=5_000
         split = dataset.train_test_split(test_size=test_size, seed=random_seed)
         test_dataset = split["test"]
         dataset = split["train"]
+    if dataset_name == "snli":
+        filter_func = lambda d: d['label'] != -1
+    if filter_func:
+        dataset = dataset.filter(filter_func)
+        test_dataset = dataset.filter(filter_func)
     train_val_split = dataset.train_test_split(test_size=val_size, seed=random_seed)
     # we only want to use train_size samples for training
     train_dataset = train_val_split["train"].train_test_split(train_size=train_size, seed=random_seed)["train"]
