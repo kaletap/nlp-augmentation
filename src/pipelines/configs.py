@@ -74,7 +74,7 @@ common_config = {
 }
 
 experiments_setup = {
-    "train_samples": ("all",), #[10, 100, 1000, 10000],
+    "train_samples": (1000,), #[10, 100, 1000, 10000],
     "augmentations": ("no_aug",),# "vae", "rules", "style_transfer"],
     "seeds": (1990,),# 9, 11, 21, 37]
     "tasks": {
