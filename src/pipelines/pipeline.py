@@ -10,6 +10,7 @@ from fastai.data import block, transforms
 from blurr import utils
 
 from blurr.modeling import summarization as model_sum
+from blurr.modeling import question_answering as model_qa
 from blurr.data import question_answering as data_qa
 from blurr.data import core as data_core
 from blurr.modeling import core as model_core
@@ -40,11 +41,9 @@ class BlurrPipeline:
         params = self.parameters["train_params"][self.parameters["train_samples"]]
         unfrozen_epochs = params["epochs"][0]
         params["epochs"] = params["epochs"][1:]
-        import pdb;
-        pdb.set_trace()
 
-        # rez = self.learn.lr_find()
-        self.learn.fit_one_cycle(unfrozen_epochs, lr_max=0.0004)
+        lr = self.learn.lr_find().lr_min
+        self.learn.fit_one_cycle(unfrozen_epochs, lr_max=training_utils.get_lr(lr, lr_divs[0],  lr_divs[1]))
         for epoch, unfreeze, lr_divs in zip(params.values()):
             if unfreeze == "all":
                 self.learn.unfreeze()
@@ -147,21 +146,17 @@ class BlurrPipeline:
     def get_learner(cls, databunch, arch, pre_model, pre_config, config):
         model = model_core.HF_BaseModelWrapper(pre_model)
         model_cb = cls.get_callbacks(pre_config, config["pre_config_overwrite"])
-        # if model_cb is None:
-        #     model_cb = [progress.CSVLogger]
-        # else:
-        #     model_cb = model_cb + [progress.CSVLogger]
+        model_cb = model_cb + [progress.CSVLogger]
         splitter = cls.get_splitter(arch)
         learn = learner.Learner(
             databunch,
             model,
             opt_func=config["opt_func"],
-            #loss_func=config["loss_func"](),
+            loss_func=config["loss_func"](),
             cbs=model_cb,
             splitter=splitter,
         )
         # learn = cls.add_custom_metrics(learn, config["metrics"])
-        learn.loss_func = config["loss_func"]()
         learn.create_opt()
         learn.freeze()
         return learn
@@ -187,13 +182,13 @@ class QuestionAnsweringPipeline(BlurrPipeline):
 
     @classmethod
     def get_callbacks(cls, pre_config, config):
-        return None
+        return [model_qa.HF_QstAndAnsModelCallback]
 
     @classmethod
     def get_databunch_from_name(cls, ds, aug_fn, arch, tokenizer, params):
         vocab = list(range(params["max_len"]))
         df = cls.load_data(ds, params["train_samples"])
-        processed_df = data_processing.processing_from_name(df, ds, arch, tokenizer, params["max_len"])
+        processed_df = data_processing.processing_from_name(df, ds, tokenizer, params["max_len"])
 
         trunc_strat = 'only_second' if (tokenizer.padding_side == 'right') else 'only_first'
         hf_batch_tfm = data_qa.HF_QABatchTransform(arch, tokenizer,
@@ -207,16 +202,13 @@ class QuestionAnsweringPipeline(BlurrPipeline):
             block.CategoryBlock(vocab=vocab)
         )
 
-        # get_question_auged = aug_fn(params["x_col"][0])
-        # get_context_auged = aug_fn(params["x_col"][1])
-
-        # def get_x(x):
-        #     return (get_question_auged(x), get_context_auged(x)) \
-        #         if (tokenizer.padding_side == 'right') \
-        #         else (get_context_auged(x), get_question_auged(x))
+        get_question_auged = aug_fn(params["x_col"][0])
+        get_context_auged = aug_fn(params["x_col"][1])
 
         def get_x(x):
-            return (x.question, x.context) if (tokenizer.padding_side == 'right') else (x.context, x.question)
+            return (get_question_auged(x), get_context_auged(x)) \
+                if (tokenizer.padding_side == 'right') \
+                else (get_context_auged(x), get_question_auged(x))
 
         dblock = block.DataBlock(blocks=blocks,
                            get_x=get_x,

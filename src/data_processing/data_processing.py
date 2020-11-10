@@ -1,22 +1,22 @@
 from functools import partial
 
 
-def processing_from_name(df, ds_name, arch, tokenizer, max_len):
+def processing_from_name(df, ds_name, tokenizer, max_len):
     if ds_name == "squad_v2":
-        df = squad_v2_preprocessing(df, arch, tokenizer, max_len)
+        df = squad_v2_preprocessing(df, tokenizer, max_len)
     return df
 
 
-def squad_v2_preprocessing(df, arch, tokenizer, max_len):
+def squad_v2_preprocessing(df, tokenizer, max_len):
     df["is_impossible"] = df["answers"].apply(lambda x: len(x["answer_start"]) == 0)
     df = df[df.is_impossible == False]
 
-    df = df.apply(partial(fixed_pre_process_squad, hf_arch=arch, hf_tokenizer=tokenizer), axis=1)
+    df = df.apply(partial(fixed_pre_process_squad, hf_tokenizer=tokenizer), axis=1)
     df = df[df["tokenized_input"].apply(lambda x: len(x) < max_len)]
     return df
 
 
-def fixed_pre_process_squad(row, hf_arch, hf_tokenizer):
+def fixed_pre_process_squad(row, hf_tokenizer):
     context, qst, ans = row['context'], row['question'], row['answers']
 
     tok_kwargs = {}
