@@ -31,7 +31,7 @@ summary_bart_config = {
     "bs": 8,
     "pre_config_overwrite": {'max_length': 130, 'min_length': 30},
     "train_params": { # should it depend on ammount of data?
-        10000: {
+        1000: {
             "epochs": [2, 1, 1],
             "unfreeze": [-3, "all"],
             "lr": ((10, 1), (100, 10)),
@@ -50,7 +50,7 @@ qa_bert_config = {
     "bs": 8,
     "pre_config_overwrite": {},
     "train_params": {
-        "all": {
+        1000: {
             "epochs": (2, 1, 1),
             "unfreeze": (-3, "all"),
             "lr": ((10, 1), (100, 10)),
