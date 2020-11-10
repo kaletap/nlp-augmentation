@@ -16,16 +16,12 @@ from blurr.modeling import core as model_core
 
 from src.data_processing import data_processing
 from src.augmentation import augmentations
+from src import training_utils
 
 # TODO
 # adding custom metrics for qa
 # implement augmenter from przemeks code
 # implement nlp aug
-
-
-def get_lr(lr, div1, div2):
-    return slice(lr / div1, lr / div2)
-
 
 
 class BlurrPipeline:
@@ -40,6 +36,7 @@ class BlurrPipeline:
         self.save_predictions()
 
     def train(self):
+        print("training started")
         params = self.parameters["train_params"][self.parameters["train_samples"]]
         unfrozen_epochs = params["epochs"][0]
         params["epochs"] = params["epochs"][1:]
@@ -50,12 +47,14 @@ class BlurrPipeline:
                 self.learn.unfreeze()
             else:
                 self.learn.freeze_to(unfreeze)
-            self.learn.fit_one_cycle(epoch, lr_max=get_lr(lr, lr_divs[0],  lr_divs[1]))
+            self.learn.fit_one_cycle(epoch, lr_max=training_utils.get_lr(lr, lr_divs[0],  lr_divs[1]))
 
     def save_model(self):
+        print("saving model started")
         self.learn.export(fname=self.parameters["model_save_paths"])
 
     def save_metrics(self):
+        print("saving metrics started")
         metrics = self.learn.csv_logger.read_log()
         final_metrics = metrics[:-1, :]
         final_metrics.to_csv(self.parameters["metrics_save_path"])
@@ -65,20 +64,15 @@ class BlurrPipeline:
         if not self.parameters["save_predictions"]:
             pass
         elif self.parameters["save_predictions"] == "train":
+            print("saving train predictions started")
             self.learn.get_preds(ds_idx=1, with_loss=True, save_preds=preds, save_targs=target)
         elif self.parameters["save_predictions"] == "test":
+            print("saving test predictions started")
             self.learn.get_preds(ds_idx=2, with_loss=True, save_preds=preds, save_targs=target)
         else:
+            print("saving all predictions started")
             self.learn.get_preds(ds_idx=1, with_loss=True, save_preds=preds, save_targs=target)
             self.learn.get_preds(ds_idx=2, with_loss=True, save_preds=preds, save_targs=target)
-
-    @classmethod
-    def get_model_from_name(cls, pretrained_model_name, model_class):
-        hf_arch, hf_config, hf_tokenizer, hf_model = utils.BLURR_MODEL_HELPER.get_hf_objects(
-            pretrained_model_name,
-            model_cls=model_class, # check if returns correct stuff without specifying a class
-        )
-        return hf_arch, hf_config, hf_tokenizer, hf_model
 
     @classmethod
     @abstractmethod
@@ -91,19 +85,20 @@ class BlurrPipeline:
         pass
 
     @classmethod
-    def get_augmentation_fn(cls, aug_name):
-        if aug_name == "no_aug":
-            return transforms.ColReader
-        else:
-            raise ValueError(f"{aug_name} is not a supported augmentation mode")
+    @abstractmethod
+    def get_splitter(cls, arch, **kwargs):
+        pass
 
     @classmethod
     def from_name(cls, exp_parameters):
         # will experiment abstraction be needed or exp_result class is enough
         # exp_parameters = add_env_vars(exp_parameters) # chyba blurr sam organie czy gpu etc.
         model_name, model_class = exp_parameters["pretrained_model_name"], exp_parameters["model_class"]
+        print(f"create pipeline from name")
         aug_fn = cls.get_augmentation_fn(exp_parameters["augmentation"])
+        print(f"augmentation {exp_parameters['augmentation']} loaded")
         arch, config, tokenizer, model = cls.get_model_from_name(model_name, model_class)
+        print(f"model_name:{model_name} loaded")
         databunch = cls.get_databunch_from_name(
             ds=exp_parameters["ds_name"],
             aug_fn=aug_fn,
@@ -111,6 +106,7 @@ class BlurrPipeline:
             tokenizer=tokenizer,
             params=exp_parameters,
         )
+        print(f"dataset :{exp_parameters['ds_name']} loaded")
         learn = cls.get_learner(
             arch=arch,
             pre_model=model,
@@ -118,28 +114,34 @@ class BlurrPipeline:
             config=exp_parameters,
             databunch=databunch
         )
+        print(f"learner setup finished")
         return cls(learn, exp_parameters)
 
     @classmethod
+    def get_model_from_name(cls, pretrained_model_name, model_class):
+        hf_arch, hf_config, hf_tokenizer, hf_model = utils.BLURR_MODEL_HELPER.get_hf_objects(
+            pretrained_model_name,
+            model_cls=model_class,
+        )
+        return hf_arch, hf_config, hf_tokenizer, hf_model
+
+    @classmethod
     def load_data(cls, dataset, train_samples):
-        data_train = datasets.load_dataset(dataset, split="train")
+        if train_samples != "all":
+            data_train = datasets.load_dataset(dataset, split="train[:train_samples]")
+            #df_train = df_train[:train_samples]
+            assert len(df_train) == train_samples, \
+                f"Dataset is too small to return requested train sample count {train_samples}"
+        else:
+            data_train = datasets.load_dataset(dataset, split="train")
         data_test = datasets.load_dataset(dataset, split="test")
         df_train = pd.DataFrame(data_train)
         df_test = pd.DataFrame(data_test)
-        if train_samples != "all":
-            df_train = df_train[:train_samples]
-            assert len(df_train) == train_samples, \
-                f"Dataset is too small to return requested train sample count {train_samples}"
+
         df_train["is_valid"] = False
         df_test["is_valid"] = True
         df = pd.concat([df_train, df_test])
         return df
-
-    @classmethod
-    def add_custom_metrics(cls, learn, metrics):
-        # custom_metrics = L([ValueMetric(partial(metric_value, metric_key=k), k) for k in metrics])
-        # learn.metrics = learn.metrics + custom_metrics
-        return learn
 
     @classmethod
     def get_learner(cls, databunch, arch, pre_model, pre_config, config):
@@ -161,9 +163,17 @@ class BlurrPipeline:
         return learn
 
     @classmethod
-    @abstractmethod
-    def get_splitter(cls, arch, **kwargs):
-        pass
+    def get_augmentation_fn(cls, aug_name):
+        if aug_name == "no_aug":
+            return transforms.ColReader
+        else:
+            raise ValueError(f"{aug_name} is not a supported augmentation mode")
+
+    @classmethod
+    def add_custom_metrics(cls, learn, metrics):
+        # custom_metrics = L([ValueMetric(partial(metric_value, metric_key=k), k) for k in metrics])
+        # learn.metrics = learn.metrics + custom_metrics
+        return learn
 
 
 class QuestionAnsweringPipeline(BlurrPipeline):
@@ -225,6 +235,8 @@ class SummarizationPipeline(BlurrPipeline):
     @classmethod
     def get_databunch_from_name(cls, ds, aug_fn, arch, tokenizer, params):
         # load data
+        import pdb;
+        pdb.set_trace()
         df = cls.load_data(ds, params["train_samples"])
         processed_df = data_processing.processing_from_name(df, ds, arch, tokenizer, params["max_len"])
 
