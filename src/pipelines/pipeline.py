@@ -109,16 +109,16 @@ class BlurrPipeline:
             tokenizer=tokenizer,
             params=exp_parameters,
         )
-        print(f"dataset :{exp_parameters['ds_name']} loaded")
-        learn = cls.get_learner(
-            arch=arch,
-            pre_model=model,
-            pre_config=config,
-            config=exp_parameters,
-            databunch=databunch
-        )
-        print(f"learner setup finished")
-        return cls(learn, exp_parameters)
+        # print(f"dataset :{exp_parameters['ds_name']} loaded")
+        # learn = cls.get_learner(
+        #     arch=arch,
+        #     pre_model=model,
+        #     pre_config=config,
+        #     config=exp_parameters,
+        #     databunch=databunch
+        # )
+        # print(f"learner setup finished")
+        return cls(databunch, exp_parameters)
 
     @classmethod
     def get_model_from_name(cls, pretrained_model_name, model_class):
