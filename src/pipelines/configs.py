@@ -30,12 +30,16 @@ summary_bart_config = {
     "metrics": (),
     "bs": 8,
     "pre_config_overwrite": {'max_length': 130, 'min_length': 30},
-    "train_params": { # should it depend on ammount of data?
+    "train_params": {
+        "all": {
+            "epochs": (1, 1),
+            "unfreeze": ("all",),
+            "lr": ((10, 1),),
+        },
         1000: {
             "epochs": [2, 1, 1],
             "unfreeze": [-3, "all"],
             "lr": ((10, 1), (100, 10)),
-            # "moms": [(0.8, 0.7), (0.8, 0.7)], # [None, None]
         },
     }
 }
@@ -51,14 +55,16 @@ qa_bert_config = {
     "pre_config_overwrite": {},
     "train_params": {
         "all": {
+            "epochs": (1, 1),
+            "unfreeze": ("all",),
+            "lr": ((10, 1),),
+        },
+        1000: {
             "epochs": (2, 1, 1),
             "unfreeze": (-3, "all"),
             "lr": ((10, 1), (100, 10)),
-            # "moms": [(0.8, 0.7), (0.8, 0.7)]
         },
     }
-    # {1000: {"epochs": [3, 2, 1], "unfreeze": [False, True, True], "lr": [lambda x:x, lambda x:slice(x/1000, x/100)]}},
-    # hmm moments?
 }
 
 common_config = {
@@ -74,7 +80,7 @@ common_config = {
 }
 
 experiments_setup = {
-    "train_samples": (1000,), #[10, 100, 1000, 10000],
+    "train_samples": ("all",), #[10, 100, 1000, 10000],
     "augmentations": ("no_aug",),# "vae", "rules", "style_transfer"],
     "seeds": (1990,),# 9, 11, 21, 37]
     "tasks": {
