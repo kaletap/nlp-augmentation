@@ -43,8 +43,8 @@ class BlurrPipeline:
         import pdb;
         pdb.set_trace()
 
-        rez = self.learn.lr_find(suggestions=True)
-        self.learn.fit_one_cycle(unfrozen_epochs, lr_max=float(rez.lr_min))
+        # rez = self.learn.lr_find()
+        self.learn.fit_one_cycle(unfrozen_epochs, lr_max=0.0004)
         for epoch, unfreeze, lr_divs in zip(params.values()):
             if unfreeze == "all":
                 self.learn.unfreeze()
@@ -130,6 +130,8 @@ class BlurrPipeline:
 
     @classmethod
     def load_data(cls, dataset, train_samples):
+        import pdb;
+        pdb.set_trace()
         data_train = datasets.load_dataset(dataset, split="train")
         data_test = datasets.load_dataset(dataset, split="validation")
         df_train = pd.DataFrame(data_train)
