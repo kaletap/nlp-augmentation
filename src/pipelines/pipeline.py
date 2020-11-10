@@ -40,8 +40,11 @@ class BlurrPipeline:
         params = self.parameters["train_params"][self.parameters["train_samples"]]
         unfrozen_epochs = params["epochs"][0]
         params["epochs"] = params["epochs"][1:]
-        lr = self.learn.lr_find(suggestions=True).lr_min
-        self.learn.fit_one_cycle(unfrozen_epochs, lr_max=lr)
+        import pdb;
+        pdb.set_trace()
+
+        rez = self.learn.lr_find(suggestions=True)
+        self.learn.fit_one_cycle(unfrozen_epochs, lr_max=float(rez.lr_min))
         for epoch, unfreeze, lr_divs in zip(params.values()):
             if unfreeze == "all":
                 self.learn.unfreeze()
@@ -232,8 +235,6 @@ class SummarizationPipeline(BlurrPipeline):
     @classmethod
     def get_databunch_from_name(cls, ds, aug_fn, arch, tokenizer, params):
         # load data
-        import pdb;
-        pdb.set_trace()
         df = cls.load_data(ds, params["train_samples"])
         processed_df = data_processing.processing_from_name(df, ds, arch, tokenizer, params["max_len"])
 
