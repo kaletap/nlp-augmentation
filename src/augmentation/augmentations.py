@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import heapq
+import itertools
 import random
 
 import numpy as np
@@ -31,7 +32,7 @@ class MLMAugmenter(ABC):
         self.model = model.eval().to(self.device)
         tokenizer = tokenizer or AutoTokenizer.from_pretrained('roberta-base', use_fast=False)
         self.tokenizer = tokenizer
-        self.vocab_words = list(tokenizer.get_vocab().keys())
+        self.vocab_words = [self.tokenizer.convert_tokens_to_string(word).strip() for word in tokenizer.get_vocab().keys()]
         self.mask_token = tokenizer.mask_token
         self.mask_token_id = tokenizer.mask_token_id
         self.topk = topk
@@ -91,13 +92,16 @@ class MLMSubstitutionAugmenter(MLMInsertionAugmenter):
         if self.fraction == 0:
             return text
         words = np.array(text.split(), dtype='object')
-        vocab_word_indices = [i for i, word in enumerate(words) if word in self.vocab_words]
+        n_mask = max(self.min_mask, int(len(words) * self.fraction))
+        n_mask = min(n_mask, self.max_mask)
+        # offset, since lenght might increase after tokenization
+        max_masked_idx = min(self.tokenizer.model_max_length // 2, len(words) + 1)
+        # can be later improved to include only some part of speech etc.
+        vocab_word_indices = [i for i, word in itertools.islice(enumerate(words), max_masked_idx)
+                              if word in self.vocab_words or word[:-1] in self.vocab_words]
         if not vocab_word_indices:
             return text
-        n_mask = max(self.min_mask, int(len(words) * self.fraction))
-        n_mask = min(n_mask, self.max_mask, len(vocab_word_indices))
-        max_masked_idx = min(self.tokenizer.model_max_length // 2 , len(words) + 1)  # offset, since lenght might increase after tokenization
-        # end of the long text won't be augmented, but I guess we can live with that
+        n_mask = min(n_mask, len(vocab_word_indices))
         masked_indices = np.sort(np.random.choice(vocab_word_indices, size=n_mask, replace=False))
         masked_words = words[masked_indices]
         words[masked_indices] = self.mask_token
