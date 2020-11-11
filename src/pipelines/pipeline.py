@@ -89,6 +89,11 @@ class BlurrPipeline:
         pass
 
     @classmethod
+    @abstractmethod
+    def get_metrics(cls):
+        pass
+
+    @classmethod
     def from_name(cls, exp_parameters):
         # will experiment abstraction be needed or exp_result class is enough
         # exp_parameters = add_env_vars(exp_parameters) # chyba blurr sam organie czy gpu etc.
@@ -152,6 +157,7 @@ class BlurrPipeline:
             cbs=model_cb,
             callback_fns=[partial(progress.CSVLogger, append=True)],# filename=config["metrics_save_paths"]
             splitter=splitter,
+            metrics=cls.get_metrics()
         )
         # learn = cls.add_custom_metrics(learn, config["metrics"])
         learn.create_opt()
