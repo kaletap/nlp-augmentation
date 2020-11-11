@@ -1,12 +1,37 @@
+from fastai.callback import core as callback_core
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 
 
-def TextF1():
-    pass
+class TextF1(callback_core.Callback):
+    def on_epoch_begin(self, **kwargs):
+        self.sum_f1, self.total = 0, 0
+
+    def on_batch_end(self, last_output, last_target, **kwargs):
+        import pdb;
+        pdb.set_trace()
+        self.total += 1
+        common_tokens = pred_tokens = truth_tokens = 1
+        prec = len(common_tokens) / len(pred_tokens)
+        rec = len(common_tokens) / len(truth_tokens)
+        self.sum_f1 += 2 * (prec * rec) / (prec + rec)
+
+    def on_epoch_end(self, **kwargs):
+        self.metric = self.sum_f1 / self.total
 
 
-def ExactMatch():
-    pass
+class ExactMatch(callback_core.Callback):
+    def on_epoch_begin(self, **kwargs):
+        self.correct, self.total = 0, 0
+
+    def on_batch_end(self, last_output, last_target, **kwargs):
+        import pdb;
+        pdb.set_trace()
+        preds = last_output.argmax(1)
+        self.correct += sum(preds == last_target)
+        self.total += preds.shape[0]
+
+    def on_epoch_end(self, **kwargs):
+        self.metric = self.correct / self.total
 
 
 def compute_binary_metrics(pred):

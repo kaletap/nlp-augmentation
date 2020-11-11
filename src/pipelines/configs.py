@@ -14,6 +14,13 @@ gigaword_config = {
     "y_col": "summary",
 }
 
+cnn_dailymail_config = {
+    "ds_name": "cnn_dailymail",
+    "max_len": (256, 130),
+    "x_col": "article",
+    "y_col": "highlights",
+}
+
 squad_v2_config = {
     "ds_name": "squad_v2",
     "max_len": 256,
@@ -85,11 +92,11 @@ common_config = {
 }
 
 experiments_setup = {
-    "train_samples": (1000, "all",), #[10, 100, 1000, 10000],
+    "train_samples": (1000,), #["all", 10, 100, 1000, 10000],
     "augmentations": ("no_aug",),# "vae", "rules", "style_transfer"],
     "seeds": (1990,),# 9, 11, 21, 37]
     "tasks": {
-        "summarization": ((pipeline.SummarizationPipeline, {**summary_bart_config, **gigaword_config, **common_config})),
+        "summarization": ((pipeline.SummarizationPipeline, {**summary_bart_config, **cnn_dailymail_config, **common_config})),
         "qa": ((pipeline.QuestionAnsweringPipeline, {**qa_bert_config, **squad_v2_config, **common_config}))
     }
 }

@@ -16,13 +16,9 @@ from blurr.data import core as data_core
 from blurr.modeling import core as model_core
 
 from src.data_processing import data_processing
+from src.pipelines import metrics
 from src.augmentation import augmentations
 from src import training_utils
-
-# TODO
-# adding custom metrics for qa
-# implement augmenter from przemeks code
-# implement nlp aug
 
 
 class BlurrPipeline:
@@ -178,6 +174,10 @@ class BlurrPipeline:
 
 class QuestionAnsweringPipeline(BlurrPipeline):
     @classmethod
+    def get_metrics(cls):
+        return [metrics.ExactMatch(), metrics.TextF1()]
+
+    @classmethod
     def get_splitter(cls, arch, **kwargs):
         return model_core.hf_splitter
 
@@ -225,6 +225,10 @@ class QuestionAnsweringPipeline(BlurrPipeline):
 
 
 class SummarizationPipeline(BlurrPipeline):
+    @classmethod
+    def get_metrics(cls):
+        return None
+
     @classmethod
     def get_splitter(cls, arch, **kwargs):
         return partial(model_sum.summarization_splitter, arch=arch)
