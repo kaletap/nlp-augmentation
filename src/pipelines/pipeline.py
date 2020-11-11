@@ -146,9 +146,6 @@ class BlurrPipeline:
     def get_learner(cls, databunch, arch, pre_model, pre_config, config):
         model = model_core.HF_BaseModelWrapper(pre_model)
         model_cb = cls.get_callbacks(pre_config, config["pre_config_overwrite"])
-        print(config)
-        save_path = config["metrics_save_paths"]
-        model_cb = model_cb + [partial(progress.CSVLogger, filename=save_path)]
         splitter = cls.get_splitter(arch)
         learn = learner.Learner(
             databunch,
@@ -156,6 +153,7 @@ class BlurrPipeline:
             opt_func=config["opt_func"],
             loss_func=config["loss_func"](),
             cbs=model_cb,
+            callback_fn=progress.CSVLogger,
             splitter=splitter,
         )
         # learn = cls.add_custom_metrics(learn, config["metrics"])
