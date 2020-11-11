@@ -154,7 +154,7 @@ class BlurrPipeline:
             opt_func=config["opt_func"],
             loss_func=config["loss_func"](),
             cbs=model_cb,
-            callback_fns=[partial(progress.CSVLogger, append=True]),# filename=config["metrics_save_paths"]
+            callback_fns=[partial(progress.CSVLogger, append=True)],# filename=config["metrics_save_paths"]
             splitter=splitter,
         )
         # learn = cls.add_custom_metrics(learn, config["metrics"])
