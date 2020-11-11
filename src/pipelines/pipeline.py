@@ -56,6 +56,7 @@ class BlurrPipeline:
         self.learn.export(fname=self.parameters["model_save_paths"])
 
     def save_metrics(self):
+        pass
         # print("saving metrics started")
         # metrics = self.learn.csv_logger.read_log()# read_logged_file()#
         # final_metrics = metrics[:-1, :]
