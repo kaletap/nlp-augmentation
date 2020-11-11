@@ -57,7 +57,6 @@ class BlurrPipeline:
 
     def save_metrics(self):
         print("saving metrics started")
-        import pdb;pdb.set_trace()
         metrics = self.learn.csv_logger.read_log()# read_logged_file()#
         final_metrics = metrics[:-1, :]
         final_metrics.to_csv(self.parameters["metrics_save_path"])
