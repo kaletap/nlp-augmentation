@@ -38,8 +38,8 @@ class BlurrPipeline:
         unfrozen_epochs = params["epochs"][0]
         params["epochs"] = params["epochs"][1:]
 
-        lr = self.learn.lr_find().lr_min
-        self.learn.fit_one_cycle(unfrozen_epochs, lr_max=lr)
+        # lr = self.learn.lr_find().lr_min
+        self.learn.fit_one_cycle(unfrozen_epochs, lr_max=0.0001)#lr
         for epoch, unfreeze, lr_divs in zip(*params.values()):
             if unfreeze == "all":
                 self.learn.unfreeze()
@@ -247,11 +247,9 @@ class SummarizationPipeline(BlurrPipeline):
 
     @classmethod
     def get_databunch_from_name(cls, ds, aug_fn, arch, tokenizer, params):
-        # load data
         df = cls.load_data(ds, params["train_samples"])
         processed_df = data_processing.processing_from_name(df, ds, arch, tokenizer, params["max_len"])
 
-        # convert to datablock (dataset specific fragment?)
         hf_batch_tfm = model_sum.HF_SummarizationBatchTransform(
             arch,
             tokenizer,
@@ -260,7 +258,6 @@ class SummarizationPipeline(BlurrPipeline):
         blocks = (data_core.HF_TextBlock(hf_batch_tfm=hf_batch_tfm), imports.noop)
         get_x = aug_fn(params["x_col"])
 
-        # update ColReader with augmentation technique
         dblock = block.DataBlock(blocks=blocks,
                            get_x=get_x,
                            get_y=transforms.ColReader(params["y_col"]),
