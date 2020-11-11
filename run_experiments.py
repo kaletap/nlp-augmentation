@@ -1,3 +1,4 @@
+from copy import deepcopy
 from pathlib import Path
 from src.pipelines import configs
 
@@ -16,13 +17,14 @@ def fill_paths(task, train_samples, aug, seed, config):
 
 
 def run_exp(task, main_config):
-    pipe_cls, config = main_config["tasks"][task]
+    pipe_cls, og_config = main_config["tasks"][task]
     for aug in main_config["augmentations"]:
-        config["augmentation"] = aug
+        og_config["augmentation"] = aug
         for train_samples in main_config["train_samples"]:
-            config["train_samples"] = train_samples
+            og_config["train_samples"] = train_samples
             for seed in main_config["seeds"]:
-                config["seed"] = seed
+                og_config["seed"] = seed
+                config = deepcopy(og_config)
                 config = fill_paths(task, train_samples, aug, seed, config)
                 pipe = pipe_cls.from_name(exp_parameters=config)
                 pipe.run()
