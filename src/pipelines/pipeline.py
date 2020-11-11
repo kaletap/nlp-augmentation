@@ -33,8 +33,8 @@ class BlurrPipeline:
     def run(self):
         self.train()
         self.save_model()
-        self.save_metrics()
-        self.save_predictions()
+        # self.save_metrics()
+        # self.save_predictions()
 
     def train(self):
         print("training started")
@@ -153,7 +153,7 @@ class BlurrPipeline:
             opt_func=config["opt_func"],
             loss_func=config["loss_func"](),
             cbs=model_cb,
-            callback_fn=progress.CSVLogger,
+            callback_fn=partial(progress.CSVLogger, filename=config["metrics_save_paths"]),
             splitter=splitter,
         )
         # learn = cls.add_custom_metrics(learn, config["metrics"])
