@@ -191,7 +191,7 @@ class QuestionAnsweringPipeline(BlurrPipeline):
         processed_df = data_processing.processing_from_name(df, ds, tokenizer, params["max_len"])
 
         trunc_strat = 'only_second' if (tokenizer.padding_side == 'right') else 'only_first'
-        hf_batch_tfm = data_qa.HF_QABeforeBatchTransform(arch, tokenizer,
+        hf_batch_tfm = data_qa.HF_QABatchTransform(arch, tokenizer,
                                            max_length=params["max_len"],
                                            truncation=trunc_strat,
                                            tok_kwargs={'return_special_tokens_mask': True})
