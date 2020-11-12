@@ -224,7 +224,7 @@ class SummarizationPipeline(BlurrPipeline):
     @classmethod
     def get_databunch_from_name(cls, ds, aug_fn, arch, tokenizer, params):
         df = cls.load_data(ds, params["train_samples"])
-        processed_df = data_processing.processing_from_name(df, ds, arch, tokenizer, params["max_len"])
+        processed_df = data_processing.processing_from_name(df, ds, tokenizer, params["max_len"])
 
         hf_batch_tfm = model_sum.HF_SummarizationBatchTransform(
             arch,
