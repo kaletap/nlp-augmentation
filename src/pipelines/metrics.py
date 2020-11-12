@@ -1,37 +1,43 @@
-from fastai.callback import core as callback_core
+import torch
+import numpy as np
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 
 
-class TextF1(callback_core.Callback):
-    def on_epoch_begin(self, **kwargs):
-        self.sum_f1, self.total = 0, 0
+def calculate_text_f1(pred_starts, pred_ends, target_starts, target_ends):
+    pred_starts = torch.clamp(pred_starts, min=0)
+    pred_ends = torch.max(pred_starts, pred_ends)
 
-    def on_batch_end(self, last_output, last_target, **kwargs):
-        import pdb;
-        pdb.set_trace()
-        self.total += 1
-        common_tokens = pred_tokens = truth_tokens = 1
-        prec = len(common_tokens) / len(pred_tokens)
-        rec = len(common_tokens) / len(truth_tokens)
-        self.sum_f1 += 2 * (prec * rec) / (prec + rec)
+    prediction_lenght = pred_ends - pred_starts
+    target_lenght = target_ends - target_starts
 
-    def on_epoch_end(self, **kwargs):
-        self.metric = self.sum_f1 / self.total
+    pred_zero_mask = prediction_lenght == 0
+    target_zero_mask = target_lenght == 0
+    correct_zeros = pred_zero_mask & target_zero_mask
+
+    common_tokens = torch.clamp(torch.min(pred_ends, target_ends) - torch.max(pred_starts, target_starts), min=0)
+    prec = common_tokens / prediction_lenght
+    rec = common_tokens / target_lenght
+    f1_score = 2 * (prec * rec) / (prec + rec)
+
+    f1_score[pred_zero_mask] = 0
+    f1_score[target_zero_mask] = 0
+    f1_score[torch.isnan(f1_score)] = 0
+    f1_score[correct_zeros] = 1
+
+    f1_score = f1_score.mean()
+
+    return f1_score
 
 
-class ExactMatch(callback_core.Callback):
-    def on_epoch_begin(self, **kwargs):
-        self.correct, self.total = 0, 0
+def calculate_text_exact_match(pred_starts, pred_ends, target_starts, target_ends):
+    exact_match = np.true_divide(((pred_starts == target_starts) & (pred_ends == target_ends)).sum(), len(pred_starts))
+    return exact_match
 
-    def on_batch_end(self, last_output, last_target, **kwargs):
-        import pdb;
-        pdb.set_trace()
-        preds = last_output.argmax(1)
-        self.correct += sum(preds == last_target)
-        self.total += preds.shape[0]
 
-    def on_epoch_end(self, **kwargs):
-        self.metric = self.correct / self.total
+def calculate_qa_metric(pred_starts, pred_ends, target_starts, target_ends, metric_key):
+    if (metric_key == 'exact_match'): return calculate_text_exact_match(pred_starts, pred_ends, target_starts,
+                                                                        target_ends)
+    if (metric_key == 'f1'): return calculate_text_f1(pred_starts, pred_ends, target_starts, target_ends)
 
 
 def compute_binary_metrics(pred):

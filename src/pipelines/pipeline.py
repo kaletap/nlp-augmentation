@@ -8,7 +8,6 @@ from fastai import learner
 from fastai.callback import progress
 from fastai.data import block, transforms
 from blurr import utils
-
 from blurr.modeling import summarization as model_sum
 from blurr.modeling import question_answering as model_qa
 from blurr.data import question_answering as data_qa
@@ -16,7 +15,7 @@ from blurr.data import core as data_core
 from blurr.modeling import core as model_core
 
 from src.data_processing import data_processing
-from src.pipelines import metrics
+from src.model import question_anwsering
 from src.augmentation import augmentations
 from src import training_utils
 
@@ -38,8 +37,8 @@ class BlurrPipeline:
         unfrozen_epochs = params["epochs"][0]
         params["epochs"] = params["epochs"][1:]
 
-        # lr = self.learn.lr_find().lr_min
-        self.learn.fit_one_cycle(unfrozen_epochs, lr_max=0.0001)#lr
+        lr = self.learn.lr_find().lr_min
+        self.learn.fit_one_cycle(unfrozen_epochs, lr_max=lr)
         for epoch, unfreeze, lr_divs in zip(*params.values()):
             if unfreeze == "all":
                 self.learn.unfreeze()
@@ -89,14 +88,7 @@ class BlurrPipeline:
         pass
 
     @classmethod
-    @abstractmethod
-    def get_metrics(cls):
-        pass
-
-    @classmethod
     def from_name(cls, exp_parameters):
-        # will experiment abstraction be needed or exp_result class is enough
-        # exp_parameters = add_env_vars(exp_parameters) # chyba blurr sam organie czy gpu etc.
         model_name, model_class = exp_parameters["pretrained_model_name"], exp_parameters["model_class"]
         print(f"create pipeline from name")
         aug_fn = cls.get_augmentation_fn(exp_parameters["augmentation"])
@@ -155,11 +147,9 @@ class BlurrPipeline:
             opt_func=config["opt_func"],
             loss_func=config["loss_func"](),
             cbs=model_cb,
-            callback_fns=[partial(progress.CSVLogger, append=True)],# filename=config["metrics_save_paths"]
+            callback_fns=[partial(progress.CSVLogger, append=True)],
             splitter=splitter,
-            metrics=cls.get_metrics()
         )
-        # learn = cls.add_custom_metrics(learn, config["metrics"])
         learn.create_opt()
         learn.freeze()
         return learn
@@ -171,25 +161,15 @@ class BlurrPipeline:
         else:
             raise ValueError(f"{aug_name} is not a supported augmentation mode")
 
-    @classmethod
-    def add_custom_metrics(cls, learn, metrics):
-        # custom_metrics = L([ValueMetric(partial(metric_value, metric_key=k), k) for k in metrics])
-        # learn.metrics = learn.metrics + custom_metrics
-        return learn
-
 
 class QuestionAnsweringPipeline(BlurrPipeline):
-    @classmethod
-    def get_metrics(cls):
-        return [metrics.ExactMatch(), metrics.TextF1()]
-
     @classmethod
     def get_splitter(cls, arch, **kwargs):
         return model_core.hf_splitter
 
     @classmethod
     def get_callbacks(cls, pre_config, config):
-        return [model_qa.HF_QstAndAnsModelCallback]
+        return [question_anwsering.HF_QstAndAnsModelCallbackWithMetrics]
 
     @classmethod
     def get_databunch_from_name(cls, ds, aug_fn, arch, tokenizer, params):
@@ -231,10 +211,6 @@ class QuestionAnsweringPipeline(BlurrPipeline):
 
 
 class SummarizationPipeline(BlurrPipeline):
-    @classmethod
-    def get_metrics(cls):
-        return None
-
     @classmethod
     def get_splitter(cls, arch, **kwargs):
         return partial(model_sum.summarization_splitter, arch=arch)
