@@ -23,8 +23,8 @@ from src.pipelines.datasets import get_datasets
 output_dir = '/kaggle/temp/'
 save_dir = "."
 AUGMENTATION = "mlm_substitution"
+AUGMENTATION_PROB = 0.7
 augmentation_config = {
-    "augmentation_prob": 0.7,
     "fraction": 0.12,
     "min_mask": 1,
     "max_mask": 100,
@@ -52,7 +52,7 @@ def run_exp():
                 config["train_size"],
                 val_size=config["val_size"],
                 test_size=config["test_size"],
-                augmentation_prob=augmentation_config["augmentation_prob"]
+                augmentation_prob=AUGMENTATION_PROB
             )
             print(f"Train size: {len(train_dataset)}, Validation size: {len(val_dataset)}, Test size: {len(test_dataset)}")
             print(train_dataset[0])
