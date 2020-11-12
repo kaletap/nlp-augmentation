@@ -53,7 +53,8 @@ def run_exp():
                 train_size,
                 val_size=config["val_size"],
                 test_size=config["test_size"],
-                augmentation_prob=AUGMENTATION_PROB
+                augmentation_prob=AUGMENTATION_PROB,
+                load_test=config["load_test"]
             )
             print(f"Train size: {len(train_dataset)}, Validation size: {len(val_dataset)}, Test size: {len(test_dataset)}")
             print(train_dataset[0])
