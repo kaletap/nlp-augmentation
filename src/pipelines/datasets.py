@@ -18,9 +18,7 @@ class DatasetWithAugmentation(Dataset):
             except:
                 print(f"Something went wrong when augmenting item number {i}")
                 print(item)
-                return item
-        else:
-            return item
+        return item
 
     def __len__(self):
         return len(self.dataset)
