@@ -2,9 +2,6 @@ import json
 import os
 from collections import defaultdict
 
-# %pip install datasets
-# %pip install transformers
-import torch
 from transformers import (
     AutoModelForMaskedLM,
     AutoModelForSequenceClassification,
@@ -13,7 +10,7 @@ from transformers import (
     TrainingArguments
 )
 
-from src.augmentation import MLMInsertionAugmenter, MLMSubstitutionAugmenter
+from src.augmentation import MLMSubstitutionAugmenter
 from src.data_processing import DataCollator
 from src.pipelines.configs import dataset_configs
 from src.pipelines.datasets import get_datasets

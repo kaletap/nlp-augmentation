@@ -1,5 +1,5 @@
-datasetes
-fastai
-ohmeow-blurr
-torch
-transformers
+datasetes--1.1.2
+fastai==2.0.16
+ohmeow-blurr==0.0.14
+torch==1.6.0
+transformers==3.4.0
