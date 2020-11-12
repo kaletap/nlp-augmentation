@@ -40,8 +40,9 @@ def run_exp():
     augmenter = MLMSubstitutionAugmenter(mlm_model, tokenizer, **augmentation_config)
 
     accuracies = defaultdict(list)
-
+    print(augmentation_config)
     for name, config in dataset_configs.items():
+        print(name, config)
         for train_size in config["train_sizes"]:
             data_collator = DataCollator(tokenizer, text_colname=config["text_colname"], label_colname=config["label_colname"])
             model = AutoModelForSequenceClassification.from_pretrained('roberta-base', return_dict=True)
