@@ -5,6 +5,7 @@ import transformers
 from blurr.modeling import summarization as model_sum
 from blurr.modeling import question_answering as model_qa
 
+from src.pipelines.metrics import compute_binary_metrics, compute_multiclass_metrics
 from src.pipelines import pipeline
 
 gigaword_config = {
@@ -100,3 +101,82 @@ experiments_setup = {
         "qa": ((pipeline.QuestionAnsweringPipeline, {**qa_bert_config, **squad_v2_config, **common_config}))
     }
 }
+
+# Classification datasets configs
+
+ag_news_config = {
+    "dataset_name": "ag_news",
+    "num_labels": 4,
+    "text_colname": "text",
+    "label_colname": "label",
+    "val_size": 5_000,
+    "test_size": None,
+    "batch_size": 8,
+    "gradient_accumulation_steps": 2,
+    "metrics_function": compute_multiclass_metrics,
+    "train_sizes": [20, 100, 1_000, 10_000, 100_000]
+}
+
+imdb_config = {
+    "dataset_name": "imdb",
+    "num_labels": 2,
+    "text_colname": "text",
+    "label_colname": "label",
+    "val_size": 1_000,
+    "test_size": 5_000,
+    "batch_size": 8,
+    "gradient_accumulation_steps": 2,
+    "metrics_function": compute_binary_metrics,
+    "train_sizes": [20, 100, 1_000, 10_000]
+}
+
+snli_config = {
+    "dataset_name": "snli",
+    "num_labels": 3,
+    "text_colname": "text",
+    "label_colname": "label",
+    "val_size": 7_000,
+    "test_size": None,
+    "batch_size": 8,
+    "gradient_accumulation_steps": 2,
+    "metrics_function": compute_multiclass_metrics,
+    "train_sizes": [20, 100, 1_000, 10_000, 100_000]
+}
+
+twitter_config = {
+    "dataset_name": "sentiment140",
+    "num_labels": 2,
+    "text_colname": "text",
+    "label_colname": "sentiment",
+    "val_size": 5_000,
+    "test_size": 20_000,
+    "batch_size": 8,
+    "gradient_accumulation_steps": 2,
+    "metrics_function": compute_binary_metrics,
+    "train_sizes": [20, 100, 1_000, 10_000, 100_000]
+}
+
+yelp_config = {
+    "dataset_name": "yelp_polarity",
+    "num_labels": 2,
+    "text_colname": "text",
+    "label_colname": "label",
+    "val_size": 1_000,
+    "test_size": 5_000,
+    "batch_size": 8,
+    "gradient_accumulation_steps": 2,
+    "metrics_function": compute_binary_metrics,
+    "train_sizes": [20, 100, 1_000, 10_000]
+}
+
+dataset_configs = {
+    "ag_news": ag_news_config,
+    "imdb": imdb_config,
+    "snli": snli_config,
+    "twitter": twitter_config,
+    "yelp": yelp_config
+}
+
+keys = ag_news_config.keys()
+for config in dataset_configs.values():
+    assert config.keys() == keys

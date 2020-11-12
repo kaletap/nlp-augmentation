@@ -10,7 +10,7 @@ class DataCollator:
         self.label_colname = label_colname
 
     def __call__(self, examples: List[dict]):
-        if self.label_colname == 'sentiment':
+        if self.label_colname == 'sentiment':  # a hack for sentiment140 dataset
             labels = [0 if example[self.label_colname] == 0 else 1 for example in examples]
         else:
             labels = [example[self.label_colname] for example in examples]
