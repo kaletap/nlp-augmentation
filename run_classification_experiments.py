@@ -50,7 +50,7 @@ def run_exp():
             train_dataset, val_dataset, test_dataset = get_datasets(
                 config["dataset_name"],
                 augmenter,
-                config["train_size"],
+                train_size,
                 val_size=config["val_size"],
                 test_size=config["test_size"],
                 augmentation_prob=AUGMENTATION_PROB
