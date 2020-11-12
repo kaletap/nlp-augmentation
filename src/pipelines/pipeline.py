@@ -27,8 +27,8 @@ class BlurrPipeline:
 
     def run(self):
         self.train()
-        self.save_model()
         self.save_metrics()
+        self.save_model()
         self.save_predictions()
 
     def train(self):
@@ -48,6 +48,7 @@ class BlurrPipeline:
 
     def save_model(self):
         print("saving model started")
+        self.learn.csv_logger = None
         self.learn.export(fname=self.parameters["model_save_paths"])
 
     def save_metrics(self):
@@ -139,6 +140,7 @@ class BlurrPipeline:
     def get_learner(cls, databunch, arch, pre_model, pre_config, config):
         model = model_core.HF_BaseModelWrapper(pre_model)
         model_cb = cls.get_callbacks(pre_config, config["pre_config_overwrite"])
+        model_cb += [progress.CSVLogger]
         splitter = cls.get_splitter(arch)
         learn = learner.Learner(
             databunch,
@@ -146,7 +148,6 @@ class BlurrPipeline:
             opt_func=config["opt_func"],
             loss_func=config["loss_func"](),
             cbs=model_cb,
-            callback_fns=[partial(progress.CSVLogger, append=True)],
             splitter=splitter,
         )
         learn.create_opt()
