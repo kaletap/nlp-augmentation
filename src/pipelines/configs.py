@@ -9,22 +9,22 @@ from src.pipelines.metrics import compute_binary_metrics, compute_multiclass_met
 from src.pipelines import pipeline
 
 gigaword_config = {
-    "ds_name": "gigaword",
+    "ds_name": ("gigaword",),
     "max_len": (256, 130),
     "x_col": "document",
     "y_col": "summary",
 }
 
 cnn_dailymail_config = {
-    "ds_name": "cnn_dailymail",
+    "ds_name": ("cnn_dailymail", '3.0.0'),
     "max_len": (256, 130),
     "x_col": "article",
     "y_col": "highlights",
 }
 
 squad_v2_config = {
-    "ds_name": "squad_v2",
-    "max_len": 256,
+    "ds_name": ("squad_v2",),
+    "max_len": 156,
     "x_col": ("question", "context"),
     "y_col": ("tok_answer_start", "tok_answer_end"),
 }
@@ -36,7 +36,7 @@ summary_bart_config = {
     "opt_func": optimizer.ranger,
     "loss_func": model_sum.HF_MaskedLMLoss,
     "metrics": (),
-    "bs": 8,
+    "bs": 2,
     "pre_config_overwrite": {'max_length': 130, 'min_length': 30},
     "train_params": {
         "all": {
@@ -68,9 +68,9 @@ qa_bert_config = {
             "lr": (),
         },
         1000: {
-            "epochs": (1, 1),
-            "unfreeze": (-1,),
-            "lr": ((10, 1),),
+            "epochs": (1,),
+            "unfreeze": (),
+            "lr": (),
         },
     }
 }
