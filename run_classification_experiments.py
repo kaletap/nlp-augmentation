@@ -99,10 +99,11 @@ def run_exp():
             test_result = trainer.evaluate(test_dataset)
             accuracies[name].append(test_result['eval_accuracy'])
             with open(os.path.join(save_dir, f'{name}_{AUGMENTATION}_train_size_{train_size}.json'), 'w') as f:
-                json.dump(test_result, f)
+                json.dump(test_result, f, indent=4)
             print(test_result)
             with open(os.path.join(save_dir, 'accuracies.json'), 'w') as f:
-                json.dump(test_result, f)
+                json.dump(accuracies, f, indent=4)
+            print(accuracies)
             print()
 
 
