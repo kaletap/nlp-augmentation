@@ -62,6 +62,7 @@ def run_exp():
                 20: 10,
                 100: 10,
                 1000: 8,
+                2_500: 7,
                 10_000: 6,
                 100_000: 3
             }.get(train_size, 6)
@@ -74,7 +75,7 @@ def run_exp():
                 learning_rate=3e-5,
                 weight_decay=0.01,
                 per_device_train_batch_size=config["batch_size"],
-                per_device_eval_batch_size=config["batch_size"],
+                per_device_eval_batch_size=config["eval_batch_size"],
                 gradient_accumulation_steps=config["gradient_accumulation_steps"],
                 warmup_steps=0,
                 logging_steps=10,
@@ -83,6 +84,7 @@ def run_exp():
                 metric_for_best_model="eval_accuracy",
                 remove_unused_columns=False,
                 no_cuda=False,
+                dataloader_num_workers=2
             )
 
             trainer = Trainer(
