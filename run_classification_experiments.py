@@ -84,7 +84,7 @@ def run_exp():
                 metric_for_best_model="eval_accuracy",
                 remove_unused_columns=False,
                 no_cuda=False,
-                dataloader_num_workers=1
+                dataloader_num_workers=0
             )
 
             trainer = Trainer(
