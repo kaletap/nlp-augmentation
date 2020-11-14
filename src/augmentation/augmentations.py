@@ -5,11 +5,25 @@ import random
 
 import numpy as np
 import torch
+from fastai.data import transforms
 from transformers import AutoModelForMaskedLM, AutoTokenizer
 
 
+class AugmenterWrapper:
+    def __init__(self, col, augmenter):
+        self.col_reader = transforms.ColReader(col)
+        self.augmenter = augmenter
+
+    def __call__(self, *args, **kwargs):
+        text = self.col_reader(*args, **kwargs)
+        augmented_text = self.augmenter(text)
+        return augmented_text
+
+
 class RuleBasedAugmenter:
-    pass
+    def __call__(self, text: str):
+        import pdb;pdb.set_trace()
+        return text
 
 
 class MLMAugmenter(ABC):

@@ -168,8 +168,13 @@ class BlurrPipeline:
     def get_augmentation_fn(cls, aug_name):
         if aug_name == "no_aug":
             return transforms.ColReader
+        elif aug_name == "rules":
+            augmenter = augmentations.RuleBasedAugmenter()
+        elif aug_name == "LM":
+            augmenter = augmentations.MLMSubstitutionAugmenter()
         else:
             raise ValueError(f"{aug_name} is not a supported augmentation mode")
+        return partial(augmentations.AugmenterWrapper, augmenter=augmenter)
 
     def get_dataset(self, ds_type):
         if 'train' == ds_type:
