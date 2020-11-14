@@ -27,7 +27,7 @@ class MLMAugmenter(ABC):
         :param uniform: whether to sample uniformly from topk words (defaults to False)
         :param device: torch.device
         """
-        self.device = device or torch.device('cpu')
+        self.device = device or torch.device('cuda')
         model = model or AutoModelForMaskedLM.from_pretrained('roberta-base', return_dict=True)
         self.model = model.eval().to(self.device)
         tokenizer = tokenizer or AutoTokenizer.from_pretrained('roberta-base', use_fast=False)
@@ -52,7 +52,7 @@ class MLMAugmenter(ABC):
 
         words, probas = zip(*most_probable)
         word = random.choice(words) if self.uniform else random.choices(words, weights=probas)[0]
-        return self.tokenizer.convert_tokens_to_string(word).strip()
+        return word
 
     @abstractmethod
     def __call__(self, text: str):

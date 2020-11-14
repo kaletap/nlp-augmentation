@@ -59,9 +59,10 @@ def run_exp():
             print(test_dataset[0])
 
             num_train_epochs = {
-                20: 5,
+                20: 10,
                 100: 10,
                 1000: 8,
+                2_500: 7,
                 10_000: 6,
                 100_000: 3
             }.get(train_size, 6)
@@ -74,7 +75,7 @@ def run_exp():
                 learning_rate=3e-5,
                 weight_decay=0.01,
                 per_device_train_batch_size=config["batch_size"],
-                per_device_eval_batch_size=config["batch_size"],
+                per_device_eval_batch_size=config["eval_batch_size"],
                 gradient_accumulation_steps=config["gradient_accumulation_steps"],
                 warmup_steps=0,
                 logging_steps=10,
@@ -83,6 +84,7 @@ def run_exp():
                 metric_for_best_model="eval_accuracy",
                 remove_unused_columns=False,
                 no_cuda=False,
+                dataloader_num_workers=0
             )
 
             trainer = Trainer(
@@ -99,10 +101,11 @@ def run_exp():
             test_result = trainer.evaluate(test_dataset)
             accuracies[name].append(test_result['eval_accuracy'])
             with open(os.path.join(save_dir, f'{name}_{AUGMENTATION}_train_size_{train_size}.json'), 'w') as f:
-                json.dump(test_result, f)
+                json.dump(test_result, f, indent=4)
             print(test_result)
             with open(os.path.join(save_dir, 'accuracies.json'), 'w') as f:
-                json.dump(test_result, f)
+                json.dump(accuracies, f, indent=4)
+            print(accuracies)
             print()
 
 
