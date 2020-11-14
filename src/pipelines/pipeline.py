@@ -29,8 +29,8 @@ class BlurrPipeline:
     def run(self):
         self.train()
         self.save_metrics()
-        self.save_model()
         self.save_predictions()
+        self.save_model()
 
     def train(self):
         print("training started")
@@ -50,6 +50,7 @@ class BlurrPipeline:
     def save_model(self):
         print("saving model started")
         self.learn.remove_cb(progress.CSVLogger)
+        self.learn.dls = None
         self.learn.export(fname=self.parameters["model_save_paths"])
 
     def save_metrics(self):
