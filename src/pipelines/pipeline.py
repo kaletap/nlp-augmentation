@@ -79,7 +79,7 @@ class BlurrPipeline:
             preds.to_csv(self.parameters["targets_save_paths"])
 
     @abstractmethod
-    def get_predictions(self, ds_type, tokenizer):
+    def get_batch_predictions(self, ds_type, tokenizer):
         pass
 
     @classmethod
@@ -180,30 +180,34 @@ class BlurrPipeline:
             raise ValueError()
         return data
 
-
-class QuestionAnsweringPipeline(BlurrPipeline):
-    def get_qa_preds_dataset(self):
+    def get_preds_dataset(self):
         return pd.DataFrame(columns=["ds_type", "text", "pred", "target"])
 
     def get_predictions(self, ds_type, tokenizer):
         data = self.get_dataset(ds_type)
-        comb_df = self.get_qa_preds_dataset()
-        for x, target_start, target_end in data:
+        comb_df = self.get_preds_dataset()
+        for sample in data:
             with torch.no_grad():
-                new_df = self.get_qa_preds_dataset()
-                preds = self.learn.model.forward(x)
-                preds_start, preds_end = preds.start_logits.argmax(dim=1).tolist(), preds.end_logits.argmax(
-                    dim=1).tolist()
-                preds = [(s, e) for s, e in zip(preds_start, preds_end)]
-                target_start, target_end = target_start.tolist(), target_end.tolist()
-                targets = [(s, e) for s, e in zip(target_start, target_end)]
-                txt = [tokenizer.decode(tokens, skip_special_tokens=True) for tokens in x['input_ids']]
-
-                for i, data in enumerate(zip(txt, preds, targets)):
-                    new_df.loc[i] = [ds_type] + list(data)
+                new_df = self.get_preds_dataset()
+                preds = self.learn.model.forward(sample[0])
+                batch_preds = self.get_batch_predictions(preds, sample)
+                for i, batch_pred in enumerate(zip(batch_preds)):
+                    new_df.loc[i] = [ds_type] + list(batch_pred)
             comb_df = pd.concat([comb_df, new_df])
         comb_df = comb_df.reset_index(drop=True)
         return comb_df
+
+
+class QuestionAnsweringPipeline(BlurrPipeline):
+    def get_batch_predictions(self, preds, sample):
+        x, target_start, target_end = sample
+        preds_start, preds_end = preds.start_logits.argmax(dim=1).tolist(), preds.end_logits.argmax(
+            dim=1).tolist()
+        preds = [(s, e) for s, e in zip(preds_start, preds_end)]
+        target_start, target_end = target_start.tolist(), target_end.tolist()
+        targets = [(s, e) for s, e in zip(target_start, target_end)]
+        txt = [tokenizer.decode(tokens, skip_special_tokens=True) for tokens in x['input_ids']]
+        return txt, preds, targets
 
     @classmethod
     def get_splitter(cls, arch, **kwargs):
@@ -253,6 +257,14 @@ class QuestionAnsweringPipeline(BlurrPipeline):
 
 
 class SummarizationPipeline(BlurrPipeline):
+    def get_batch_predictions(self, preds, sample, tokenizer):
+        x, target = sample
+        preds = preds.logits.argmax(dim=-1)
+        txt = [tokenizer.decode(tokens, skip_special_tokens=True) for tokens in x['input_ids']]
+        target_txt = [tokenizer.decode(tokens, skip_special_tokens=True) for tokens in target]
+        pred_txt = [tokenizer.decode(tokens, skip_special_tokens=True) for tokens in preds]
+        return txt, pred_txt, target_txt
+
     @classmethod
     def get_splitter(cls, arch, **kwargs):
         return partial(model_sum.summarization_splitter, arch=arch)
