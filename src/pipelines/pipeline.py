@@ -204,7 +204,7 @@ class BlurrPipeline:
 
 
 class QuestionAnsweringPipeline(BlurrPipeline):
-    def get_batch_predictions(self, preds, sample):
+    def get_batch_predictions(self, preds, sample, tokenizer):
         x, target_start, target_end = sample
         preds_start, preds_end = preds.start_logits.argmax(dim=1).tolist(), preds.end_logits.argmax(
             dim=1).tolist()
