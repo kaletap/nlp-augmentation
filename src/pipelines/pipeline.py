@@ -48,7 +48,7 @@ class BlurrPipeline:
 
     def save_model(self):
         print("saving model started")
-        self.learn.csv_logger = None
+        self.learn.remove_cb(progress.CSVLogger)
         self.learn.export(fname=self.parameters["model_save_paths"])
 
     def save_metrics(self):
@@ -58,19 +58,28 @@ class BlurrPipeline:
         final_metrics.to_csv(self.parameters["metrics_save_paths"])
 
     def save_predictions(self):
+        tokenizer = self.learner.dls.before_batch[0].hf_tokenizer
         preds, target = self.parameters["predictions_save_paths"], self.parameters["targets_save_paths"]
         if not self.parameters["save_predictions"]:
             pass
         elif self.parameters["save_predictions"] == "train":
             print("saving train predictions started")
-            self.learn.get_preds(ds_idx=1, with_loss=True, save_preds=preds, save_targs=target)
+            preds = self.get_predictions(ds_type="train", tokenizer=tokenizer)
+            preds.to_csv(self.parameters["predictions_save_paths"])
         elif self.parameters["save_predictions"] == "test":
             print("saving test predictions started")
-            self.learn.get_preds(ds_idx=2, with_loss=True, save_preds=preds, save_targs=target)
+            preds = self.get_predictions(ds_type="valid", tokenizer=tokenizer)
+            preds.to_csv(self.parameters["targets_save_paths"])
         else:
             print("saving all predictions started")
-            self.learn.get_preds(ds_idx=1, with_loss=True, save_preds=preds, save_targs=target)
-            self.learn.get_preds(ds_idx=2, with_loss=True, save_preds=preds, save_targs=target)
+            preds = self.get_predictions(ds_type="train", tokenizer=tokenizer)
+            preds.to_csv(self.parameters["predictions_save_paths"])
+            preds = self.get_predictions(ds_type="valid", tokenizer=tokenizer)
+            preds.to_csv(self.parameters["targets_save_paths"])
+
+    @abstractmethod
+    def get_predictions(self, ds_type, tokenizer):
+        pass
 
     @classmethod
     @abstractmethod
@@ -161,8 +170,40 @@ class BlurrPipeline:
         else:
             raise ValueError(f"{aug_name} is not a supported augmentation mode")
 
+    def get_dataset(self, ds_type):
+        if 'train' == ds_type:
+            data = self.learn.dls.train
+        elif 'valid' == ds_type:
+            data = self.learn.dls.valid
+        else:
+            raise ValueError()
+        return data
+
 
 class QuestionAnsweringPipeline(BlurrPipeline):
+    def get_qa_preds_dataset(self):
+        return pd.DataFrame(columns=["ds_type", "text", "pred", "target"])
+
+    def get_predictions(self, ds_type, tokenizer):
+        data = self.get_dataset(ds_type)
+        comb_df = self.get_qa_preds_dataset()
+        for x, target_start, target_end in data:
+            with torch.no_grad():
+                new_df = self.get_qa_preds_dataset()
+                preds = self.learn.model.forward(x)
+                preds_start, preds_end = preds.start_logits.argmax(dim=1).tolist(), preds.end_logits.argmax(
+                    dim=1).tolist()
+                preds = [(s, e) for s, e in zip(preds_start, preds_end)]
+                target_start, target_end = target_start.tolist(), target_end.tolist()
+                targets = [(s, e) for s, e in zip(target_start, target_end)]
+                txt = [tokenizer.decode(tokens, skip_special_tokens=True) for tokens in x['input_ids']]
+
+                for i, data in enumerate(zip(txt, preds, targets)):
+                    new_df.loc[i] = [ds_type] + list(data)
+            comb_df = pd.concat([comb_df, new_df])
+        comb_df = comb_df.reset_index(drop=True)
+        return comb_df
+
     @classmethod
     def get_splitter(cls, arch, **kwargs):
         return model_core.hf_splitter
