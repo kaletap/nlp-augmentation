@@ -61,8 +61,8 @@ def run_exp():
             num_train_epochs = {
                 20: 10,
                 100: 10,
-                1000: 8,
-                2_500: 7,
+                1000: 7,
+                2_500: 6,
                 10_000: 6,
                 100_000: 3
             }.get(train_size, 6)
@@ -78,7 +78,7 @@ def run_exp():
                 per_device_eval_batch_size=config["eval_batch_size"],
                 gradient_accumulation_steps=config["gradient_accumulation_steps"],
                 warmup_steps=0,
-                logging_steps=10,
+                logging_steps=100,
                 load_best_model_at_end=True,
                 evaluation_strategy='epoch',
                 metric_for_best_model="eval_accuracy",

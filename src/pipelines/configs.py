@@ -111,7 +111,7 @@ ag_news_config = {
     "eval_batch_size": 8,
     "gradient_accumulation_steps": 2,
     "metrics_function": compute_multiclass_metrics,
-    "train_sizes": [2_500]
+    "train_sizes": []
 }
 
 imdb_config = {
@@ -126,13 +126,13 @@ imdb_config = {
     "eval_batch_size": 8,
     "gradient_accumulation_steps": 2,
     "metrics_function": compute_binary_metrics,
-    "train_sizes": [20, 100, 1_000, 2_500]
+    "train_sizes": []
 }
 
 snli_config = {
     "dataset_name": "snli",
     "num_labels": 3,
-    "text_colname": "text",
+    "text_colname": ["premise", "hypothesis"],
     "label_colname": "label",
     "val_size": 7_000,
     "test_size": None,
@@ -171,7 +171,7 @@ yelp_config = {
     "eval_batch_size": 8,
     "gradient_accumulation_steps": 2,
     "metrics_function": compute_binary_metrics,
-    "train_sizes": [20, 100, 1_000, 2_500]
+    "train_sizes": [20, 100, 1_000]
 }
 
 dataset_configs = {
