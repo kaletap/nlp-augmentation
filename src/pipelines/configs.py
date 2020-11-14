@@ -76,7 +76,7 @@ qa_bert_config = {
 }
 
 common_config = {
-    "save_predictions": False,
+    "save_predictions": True,
     "model_save_paths":
         "model_checkpoint_{task}_ds-{dataset}_model-{model}_train_size-{train_samples}_aug-{aug}_seed-{seed}.pkl",
     "metrics_save_paths":
