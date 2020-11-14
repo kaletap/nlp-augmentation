@@ -24,8 +24,24 @@ class DatasetWithAugmentation(Dataset):
         return len(self.dataset)
 
 
+class DatasetWithMultipleTexts(Dataset):
+    def __init__(self, dataset, text_columns, sep_token):
+        self.dataset = dataset
+        self.text_columns = text_columns
+        self.sep_token = sep_token
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, i):
+        item = self.dataset[i]
+        text = f' {self.sep_token} '.join([item[col] for col in self.text_columns])
+        item['text'] = text
+        return item
+
+
 def get_datasets(dataset_name, augmenter=None, train_size=10_000, val_size=5_000, test_size=None, augmentation_prob=0.7,
-                 random_seed: int = 42, load_test=False, filter_func=None):
+                 random_seed: int = 42, load_test=False, filter_func=None, text_columns=None, sep_token=None):
     """
     Returns a tuple of train, validation and test datasets of sizes determined by arguments.
     If load_test is False, test_size has to be specified.
@@ -50,7 +66,12 @@ def get_datasets(dataset_name, augmenter=None, train_size=10_000, val_size=5_000
     train_val_split = dataset.train_test_split(test_size=val_size, seed=random_seed)
     # we only want to use train_size samples for training
     train_dataset = train_val_split["train"].train_test_split(train_size=train_size, seed=random_seed)["train"]
+    val_dataset = train_val_split["test"]
+    if text_columns and type(text_columns) == list:
+        assert sep_token is not None, "Sep token has to be specified when using multiple text columns"
+        train_dataset = DatasetWithMultipleTexts(train_dataset, text_columns, sep_token)
+        val_dataset = DatasetWithMultipleTexts(val_dataset, text_columns, sep_token)
+        test_dataset = DatasetWithMultipleTexts(test_dataset, text_columns, sep_token)
     if augmenter:
         train_dataset = DatasetWithAugmentation(train_dataset, augmenter, augmentation_prob=augmentation_prob)
-    val_dataset = train_val_split["test"]
     return train_dataset, val_dataset, test_dataset

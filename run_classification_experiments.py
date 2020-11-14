@@ -41,7 +41,7 @@ def run_exp():
     for name, config in dataset_configs.items():
         print(name, config)
         for train_size in config["train_sizes"]:
-            data_collator = DataCollator(tokenizer, text_colname=config["text_colname"], label_colname=config["label_colname"])
+            data_collator = DataCollator(tokenizer, text_colname="text", label_colname=config["label_colname"])
             model = AutoModelForSequenceClassification.from_pretrained('roberta-base', return_dict=True, num_labels=config["num_labels"])
 
             train_dataset, val_dataset, test_dataset = get_datasets(
@@ -51,7 +51,9 @@ def run_exp():
                 val_size=config["val_size"],
                 test_size=config["test_size"],
                 augmentation_prob=AUGMENTATION_PROB,
-                load_test=config["load_test"]
+                load_test=config["load_test"],
+                text_columns=config["text_colname"],
+                sep_token=tokenizer.sep_token
             )
             print(f"Train size: {len(train_dataset)}, Validation size: {len(val_dataset)}, Test size: {len(test_dataset)}")
             print(train_dataset[0])

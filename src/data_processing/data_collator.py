@@ -14,13 +14,7 @@ class DataCollator:
             labels = [0 if example[self.label_colname] == 0 else 1 for example in examples]
         else:
             labels = [example[self.label_colname] for example in examples]
-        if type(self.text_colname) == list:
-            texts = list()
-            for example in examples:
-                text = f' {self.tokenizer.sep_token} '.join([example[col] for col in self.text_colname])
-                texts.append(text)
-        else:
-            texts = [example[self.text_colname] for example in examples]
+        texts = [example[self.text_colname] for example in examples]
         tokenizer_output = self.tokenizer(texts, truncation=True, padding=True)
         return {
             'labels': torch.tensor(labels),
