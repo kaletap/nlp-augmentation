@@ -62,7 +62,7 @@ def get_datasets(dataset_name, augmenter=None, train_size=10_000, val_size=5_000
         filter_func = lambda d: d['label'] != -1
     if filter_func:
         dataset = dataset.filter(filter_func)
-        test_dataset = dataset.filter(filter_func)
+        test_dataset = test_dataset.filter(filter_func)
     train_val_split = dataset.train_test_split(test_size=val_size, seed=random_seed)
     # we only want to use train_size samples for training
     train_dataset = train_val_split["train"].train_test_split(train_size=train_size, seed=random_seed)["train"]
