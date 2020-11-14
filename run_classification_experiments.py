@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 from collections import defaultdict
 
 from transformers import (
@@ -10,16 +11,16 @@ from transformers import (
     TrainingArguments
 )
 
-from src.augmentation import MLMSubstitutionAugmenter
+from src.augmentation import MLMInsertionAugmenter, MLMSubstitutionAugmenter
 from src.data_processing import DataCollator
 from src.pipelines.configs import dataset_configs
 from src.pipelines.datasets import get_datasets
 
 
 # Setup
-output_dir = '/kaggle/temp/'
+ROOT_OUTPUT_DIR = '/kaggle/temp/'
 save_dir = "."
-AUGMENTATION = "mlm_substitution"
+AUGMENTATION = "mlm_insertion"
 AUGMENTATION_PROB = 0.7
 augmentation_config = {
     "fraction": 0.12,
@@ -34,7 +35,7 @@ def run_exp():
     tokenizer = AutoTokenizer.from_pretrained('roberta-base', use_fast=False)
     # we can also use task fine-tuned language model if we want
     mlm_model = AutoModelForMaskedLM.from_pretrained('roberta-base', return_dict=True).eval()
-    augmenter = MLMSubstitutionAugmenter(mlm_model, tokenizer, **augmentation_config)
+    augmenter = MLMInsertionAugmenter(mlm_model, tokenizer, **augmentation_config)
 
     accuracies = defaultdict(list)
     print(augmentation_config)
@@ -69,6 +70,7 @@ def run_exp():
                 100_000: 3
             }.get(train_size, 6)
 
+            output_dir = os.path.join(ROOT_OUTPUT_DIR, f'{name}_{AUGMENTATION}_train_size_{train_size}')
             # https://huggingface.co/transformers/main_classes/trainer.html#trainingarguments
             training_args = TrainingArguments(
                 output_dir=output_dir,
@@ -108,6 +110,7 @@ def run_exp():
             with open(os.path.join(save_dir, 'accuracies.json'), 'w') as f:
                 json.dump(accuracies, f, indent=4)
             print(accuracies)
+            shutil.rmtree(output_dir, ignore_errors=True)
             print()
 
 
