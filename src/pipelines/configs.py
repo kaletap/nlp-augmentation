@@ -45,9 +45,9 @@ summary_bart_config = {
             "lr": (),
         },
         1000: {
-            "epochs": (1, 1),
-            "unfreeze": (-1,),
-            "lr": ((10, 1),),
+            "epochs": (1,),
+            "unfreeze": (),
+            "lr": (),
         },
     }
 }
