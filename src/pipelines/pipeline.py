@@ -50,8 +50,6 @@ class BlurrPipeline:
     def save_model(self):
         print("saving model started")
         self.learn.remove_cb(progress.CSVLogger)
-        import pdb;pdb.set_trace()
-        self.learn.dls = None
         self.learn.save(self.parameters["model_save_paths"])
 
     def save_metrics(self):
