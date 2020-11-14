@@ -7,7 +7,7 @@ def fill_paths(task, train_samples, aug, seed, config):
     for path in ["model_save_paths", "metrics_save_paths", "predictions_save_paths", "targets_save_paths"]:
         config[path] = Path(config[path].format(
             task=task,
-            dataset=config["ds_name"],
+            dataset="_".join(config["ds_name"]),
             model=config["pretrained_model_name"],
             train_samples=str(train_samples),
             aug=aug,
