@@ -2,6 +2,7 @@ from abc import abstractmethod
 from functools import partial
 
 import datasets
+import torch
 import pandas as pd
 from fastai import imports
 from fastai import learner
