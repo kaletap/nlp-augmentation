@@ -3,6 +3,7 @@ import heapq
 import itertools
 import random
 
+import nlpaug.augmenter.word as naw
 import numpy as np
 import torch
 from fastai.data import transforms
@@ -21,9 +22,12 @@ class AugmenterWrapper:
 
 
 class RuleBasedAugmenter:
+    def __init__(self):
+        self.augmenter = naw.SynonymAug(aug_src='wordnet')
+
     def __call__(self, text: str):
-        import pdb;pdb.set_trace()
-        return text
+        augmented_text = self.augmenter.augment(text)
+        return augmented_text
 
 
 class MLMAugmenter(ABC):

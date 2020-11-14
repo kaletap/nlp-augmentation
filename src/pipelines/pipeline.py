@@ -60,7 +60,6 @@ class BlurrPipeline:
 
     def save_predictions(self):
         tokenizer = self.learn.dls.before_batch[0].hf_tokenizer
-        preds, target = self.parameters["predictions_save_paths"], self.parameters["targets_save_paths"]
         if not self.parameters["save_predictions"]:
             pass
         elif self.parameters["save_predictions"] == "train":
