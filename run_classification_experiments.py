@@ -41,7 +41,7 @@ def run_exp():
     for name, config in dataset_configs.items():
         print(name, config)
         for train_size in config["train_sizes"]:
-            data_collator = DataCollator(tokenizer, text_colname=config["text_colname"], label_colname=config["label_colname"])
+            data_collator = DataCollator(tokenizer, text_colname="text", label_colname=config["label_colname"])
             model = AutoModelForSequenceClassification.from_pretrained('roberta-base', return_dict=True, num_labels=config["num_labels"])
 
             train_dataset, val_dataset, test_dataset = get_datasets(
@@ -51,7 +51,9 @@ def run_exp():
                 val_size=config["val_size"],
                 test_size=config["test_size"],
                 augmentation_prob=AUGMENTATION_PROB,
-                load_test=config["load_test"]
+                load_test=config["load_test"],
+                text_columns=config["text_colname"],
+                sep_token=tokenizer.sep_token
             )
             print(f"Train size: {len(train_dataset)}, Validation size: {len(val_dataset)}, Test size: {len(test_dataset)}")
             print(train_dataset[0])
@@ -61,8 +63,8 @@ def run_exp():
             num_train_epochs = {
                 20: 10,
                 100: 10,
-                1000: 8,
-                2_500: 7,
+                1000: 7,
+                2_500: 6,
                 10_000: 6,
                 100_000: 3
             }.get(train_size, 6)
@@ -78,7 +80,7 @@ def run_exp():
                 per_device_eval_batch_size=config["eval_batch_size"],
                 gradient_accumulation_steps=config["gradient_accumulation_steps"],
                 warmup_steps=0,
-                logging_steps=10,
+                logging_steps=100,
                 load_best_model_at_end=True,
                 evaluation_strategy='epoch',
                 metric_for_best_model="eval_accuracy",

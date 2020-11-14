@@ -96,9 +96,8 @@ class MLMSubstitutionAugmenter(MLMInsertionAugmenter):
         n_mask = min(n_mask, self.max_mask)
         # offset, since lenght might increase after tokenization
         max_masked_idx = min(self.tokenizer.model_max_length // 2, len(words) + 1)
-        # can be later improved to include only some part of speech etc.
         vocab_word_indices = [i for i, word in itertools.islice(enumerate(words), max_masked_idx)
-                              if word in self.vocab_words or word[:-1] in self.vocab_words]
+                              if self.substitute_word(word)]
         if not vocab_word_indices:
             return text
         n_mask = min(n_mask, len(vocab_word_indices))
@@ -117,3 +116,9 @@ class MLMSubstitutionAugmenter(MLMInsertionAugmenter):
         words[masked_indices] = predicted_words
         new_text = " ".join(words)
         return new_text
+
+    def substitute_word(self, word):
+        # can be later improved to include only some parts of speech etc.
+        if word == self.tokenizer.sep_token:
+            return False
+        return word in self.vocab_words or word[:-1] in self.vocab_words
