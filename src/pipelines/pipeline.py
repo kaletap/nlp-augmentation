@@ -195,7 +195,7 @@ class BlurrPipeline:
             with torch.no_grad():
                 new_df = self.get_preds_dataset()
                 preds = self.learn.model.forward(sample[0])
-                batch_preds = self.get_batch_predictions(preds, sample)
+                batch_preds = self.get_batch_predictions(preds, sample, tokenizer)
                 for i, batch_pred in enumerate(zip(batch_preds)):
                     new_df.loc[i] = [ds_type] + list(batch_pred)
             comb_df = pd.concat([comb_df, new_df])
