@@ -47,7 +47,7 @@ class MLMAugmenter(ABC):
         """
         self.device = device or torch.device('cuda')
         model = model or AutoModelForMaskedLM.from_pretrained('roberta-base', return_dict=True)
-        self.model = model.eval().to(self.device)
+        self.model = model.eval()#.to(self.device)
         tokenizer = tokenizer or AutoTokenizer.from_pretrained('roberta-base', use_fast=False)
         self.tokenizer = tokenizer
         self.vocab_words = [self.tokenizer.convert_tokens_to_string(word).strip() for word in tokenizer.get_vocab().keys()]
@@ -92,7 +92,7 @@ class MLMInsertionAugmenter(MLMAugmenter):
         masked_text = " ".join(masked_words)
 
         tokenizer_output = self.tokenizer([masked_text], truncation=True)
-        input_ids = torch.tensor(tokenizer_output['input_ids']).cuda()
+        input_ids = torch.tensor(tokenizer_output['input_ids'])#.cuda()
         with torch.no_grad():
             output = self.model(input_ids)
             predicted_logits = output.logits[input_ids == self.mask_token_id]
@@ -102,7 +102,7 @@ class MLMInsertionAugmenter(MLMAugmenter):
 
         new_words = np.insert(words, masked_indices, predicted_words)
         new_text = " ".join(new_words)
-        return new_text.cpu()
+        return new_text
 
 
 class MLMSubstitutionAugmenter(MLMInsertionAugmenter):
@@ -125,7 +125,7 @@ class MLMSubstitutionAugmenter(MLMInsertionAugmenter):
         masked_text = " ".join(words)
 
         tokenizer_output = self.tokenizer([masked_text], truncation=True)
-        input_ids = torch.tensor(tokenizer_output['input_ids']).cuda()
+        input_ids = torch.tensor(tokenizer_output['input_ids'])#.cuda()
         with torch.no_grad():
             output = self.model(input_ids)
             predicted_logits = output.logits[input_ids == self.mask_token_id]
@@ -133,7 +133,7 @@ class MLMSubstitutionAugmenter(MLMInsertionAugmenter):
         predicted_words = [self.sample_word(probas, black_word=word).strip() for probas, word in zip(predicted_probas, masked_words)]
         words[masked_indices] = predicted_words
         new_text = " ".join(words)
-        return new_text.cpu()
+        return new_text
 
     def substitute_word(self, word):
         # can be later improved to include only some parts of speech etc.
