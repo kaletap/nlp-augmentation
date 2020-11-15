@@ -92,7 +92,7 @@ class MLMInsertionAugmenter(MLMAugmenter):
         masked_text = " ".join(masked_words)
 
         tokenizer_output = self.tokenizer([masked_text], truncation=True)
-        input_ids = torch.tensor(tokenizer_output['input_ids']).to(self.device)
+        input_ids = torch.tensor(tokenizer_output['input_ids'])#.to(self.device)
         with torch.no_grad():
             output = self.model(input_ids)
             predicted_logits = output.logits[input_ids == self.mask_token_id]
@@ -125,7 +125,7 @@ class MLMSubstitutionAugmenter(MLMInsertionAugmenter):
         masked_text = " ".join(words)
 
         tokenizer_output = self.tokenizer([masked_text], truncation=True)
-        input_ids = torch.tensor(tokenizer_output['input_ids']).to(self.device)
+        input_ids = torch.tensor(tokenizer_output['input_ids'])#.to(self.device)
         with torch.no_grad():
             output = self.model(input_ids)
             predicted_logits = output.logits[input_ids == self.mask_token_id]
