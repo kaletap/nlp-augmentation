@@ -20,6 +20,7 @@ class DatasetWithAugmentation(Dataset):
             except Exception as e:
                 print(f"Something went wrong when augmenting item number {i}: {e}")
                 print(item)
+                self.n_errors += 1
                 if self.n_errors > self.max_errors:
                     raise Exception(f"Number of error exceeded {self.max_errors}!")
         return item
