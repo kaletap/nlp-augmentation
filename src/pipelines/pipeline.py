@@ -55,7 +55,7 @@ class BlurrPipeline:
     def save_metrics(self):
         print("saving metrics started")
         metrics = self.learn.csv_logger.read_log()
-        final_metrics = metrics.iloc[-1:, :]
+        final_metrics = metrics#.iloc[-1:, :]
         final_metrics.to_csv(self.parameters["metrics_save_paths"])
 
     def save_predictions(self):
