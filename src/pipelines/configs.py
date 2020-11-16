@@ -40,12 +40,17 @@ summary_bart_config = {
     "pre_config_overwrite": {'max_length': 130, 'min_length': 30},
     "train_params": {
         "all": {
-            "epochs": (1,),
+            "epochs": (2,),
             "unfreeze": (),
             "lr": (),
         },
         1000: {
-            "epochs": (1,),
+            "epochs": (30,),
+            "unfreeze": (),
+            "lr": (),
+        },
+        5000: {
+            "epochs": (15,),
             "unfreeze": (),
             "lr": (),
         },
@@ -93,9 +98,9 @@ common_config = {
 }
 
 experiments_setup = {
-    "train_samples": (1000, 10000, "all"), #["all", 10, 100, 1000, 10000],
-    "augmentations": ("LM",),# "vae", "rules", "style_transfer"],
-    "seeds": (1990,),# 9, 11, 21, 37]
+    "train_samples": ("all", 1000, 5000), #["all", 10, 100, 1000, 10000],
+    "augmentations": ("no-aug", "rules", "LM"),# "vae", "rules", "style_transfer"],
+    "seeds": (9, 11, 21, 37),# 9, 11, 21, 37]
     "tasks": {
         "summarization": ((pipeline.SummarizationPipeline, {**summary_bart_config, **cnn_dailymail_config, **common_config})),
         "qa": ((pipeline.QuestionAnsweringPipeline, {**qa_bert_config, **squad_v2_config, **common_config}))
