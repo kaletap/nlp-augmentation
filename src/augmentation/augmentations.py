@@ -47,7 +47,7 @@ class MLMAugmenter(ABC):
         """
         self.device = device or torch.device('cuda')
         model = model or AutoModelForMaskedLM.from_pretrained('roberta-base', return_dict=True)
-        self.model = model.eval()#.to(self.device)
+        self.model = model.eval().to(self.device)
         tokenizer = tokenizer or AutoTokenizer.from_pretrained('roberta-base', use_fast=False)
         self.tokenizer = tokenizer
         self.vocab_words = [self.tokenizer.convert_tokens_to_string(word).strip() for word in tokenizer.get_vocab().keys()]
@@ -92,7 +92,7 @@ class MLMInsertionAugmenter(MLMAugmenter):
         masked_text = " ".join(masked_words)
 
         tokenizer_output = self.tokenizer([masked_text], truncation=True)
-        input_ids = torch.tensor(tokenizer_output['input_ids'])#.cuda()
+        input_ids = torch.tensor(tokenizer_output['input_ids']).to(self.device)
         with torch.no_grad():
             output = self.model(input_ids)
             predicted_logits = output.logits[input_ids == self.mask_token_id]
@@ -125,7 +125,7 @@ class MLMSubstitutionAugmenter(MLMInsertionAugmenter):
         masked_text = " ".join(words)
 
         tokenizer_output = self.tokenizer([masked_text], truncation=True)
-        input_ids = torch.tensor(tokenizer_output['input_ids'])#.cuda()
+        input_ids = torch.tensor(tokenizer_output['input_ids']).to(self.device)
         with torch.no_grad():
             output = self.model(input_ids)
             predicted_logits = output.logits[input_ids == self.mask_token_id]
