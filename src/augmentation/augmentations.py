@@ -59,7 +59,7 @@ class MLMAugmenter(ABC):
         """
         self.device = device or torch.device('cuda')
         model = model or AutoModelForMaskedLM.from_pretrained('roberta-base', return_dict=True)
-        self.model = model.eval()#.to(self.device)
+        self.model = model.eval().to(self.device)
         tokenizer = tokenizer or AutoTokenizer.from_pretrained('roberta-base', use_fast=False)
         self.tokenizer = tokenizer
         self.vocab_words = [self.tokenizer.convert_tokens_to_string(word).strip() for word in tokenizer.get_vocab().keys()]
