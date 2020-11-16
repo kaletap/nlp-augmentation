@@ -7,7 +7,7 @@ import nlpaug.augmenter.word as naw
 import numpy as np
 import torch
 from fastai.data import transforms
-from transformers import AutoModelForMaskedLM, AutoTokenizer
+from transformers import AutoModelForMaskedLM, AutoModelForSeq2SeqLM, AutoTokenizer
 
 
 class AugmenterWrapper:
@@ -152,3 +152,76 @@ class MLMSubstitutionAugmenter(MLMInsertionAugmenter):
         if word == self.tokenizer.sep_token:
             return False
         return word in self.vocab_words or word[:-1] in self.vocab_words
+
+
+class BartAugmenter:
+    def __init__(self, model=None, tokenizer=None, fraction: float = 0.2, min_mask: int = 1, max_mask: int = 100,
+                 lambda_: float = 2.5, num_beams: int = 1, device=None):
+        """
+        :param model: huggingface/transformers model for masked language modeling
+            e.g model = BartForConditionalGeneration.from_pretrained('facebook/bart-large', return_dict=True)
+        :param tokenizer: huggingface/transformers tokenizer
+            e.g tokenizer = RobertaTokenizer.from_pretrained('roberta-base')
+        :param fraction: fraction of words to insert
+        :param min_mask: minimum number of <mask> tokens to insert
+        :param max_mask: maximum number ot tokens to mask
+        :param lambda_: mean length of masked subsequence (Poisson distribution)
+        :param num_beams: num_beams passed to model.generate()
+        :param device: torch.device
+        """
+        self.device = device or torch.device('cuda')
+        model = model or AutoModelForSeq2SeqLM.from_pretrained('facebook/bart-large', return_dict=True)
+        self.model = model.eval().to(self.device)
+        tokenizer = tokenizer or AutoTokenizer.from_pretrained('facebook/bart-large', use_fast=False)
+        self.tokenizer = tokenizer
+        self.mask_token = tokenizer.mask_token
+        self.min_mask = min_mask
+        self.max_mask = max_mask
+        self.fraction = fraction
+        self.lambda_ = lambda_
+        self.num_beams = num_beams
+
+    def __call__(self, text: str):
+        if self.fraction == 0:
+            return text
+
+        words = text.split()
+        n_mask = max(self.min_mask, round(len(words) * self.fraction))
+        n_mask = min(n_mask, self.max_mask)
+        # offset, since lenght might increase after tokenization
+        max_masked_idx = min(self.tokenizer.model_max_length - 50, len(words))
+        n_places = max(1, round(n_mask / self.lambda_))
+
+        places = np.sort(np.random.choice(max_masked_idx, size=n_places, replace=False))
+        lengths = np.random.poisson(self.lambda_, size=n_places)
+        ends = {start: start + length for start, length in zip(places, lengths)}
+        to_mask = {start + i for start, length in zip(places, lengths) for i in range(length)}
+
+        masked_words = list()
+        i = 0
+        while i < len(words):
+            if i in ends:
+                if len(masked_words) == 0 or masked_words[-1] != self.mask_token:
+                    masked_words.append(self.mask_token)
+                    i = ends[i]
+                else:
+                    masked_words.append(words[i])
+                    i += 1
+            elif i in to_mask:
+                i += 1
+            else:
+                masked_words.append(words[i])
+                i += 1
+
+        masked_text = " ".join(masked_words)
+        inputs = self.tokenizer(masked_text, max_length=1024, return_tensors='pt')
+
+        # Generate seq2seq output
+        with torch.no_grad():
+            summary_ids = \
+                self.model.generate(inputs['input_ids'], num_beams=self.num_beams, max_length=512, early_stopping=True)[0]
+            # 2 in indexing is a magic number
+            generated_text = self.tokenizer.decode(summary_ids[2:],
+                                                   skip_special_tokens=True, clean_up_tokenization_spaces=False)
+
+        return generated_text
