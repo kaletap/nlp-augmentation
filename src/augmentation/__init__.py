@@ -1,1 +1,5 @@
-from .augmentations import MLMInsertionAugmenter, MLMSubstitutionAugmenter
+from .augmentations import (
+    MLMInsertionAugmenter,
+    MLMSubstitutionAugmenter,
+    RandomWordAugmenter
+)

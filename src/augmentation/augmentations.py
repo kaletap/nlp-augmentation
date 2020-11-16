@@ -30,6 +30,18 @@ class RuleBasedAugmenter:
         return augmented_text
 
 
+class RandomWordAugmenter:
+    """
+    https://nlpaug.readthedocs.io/en/latest/augmenter/word/random.html
+    """
+    def __init__(self, action="swap", *args, **kwargs):
+        self.augmenter = naw.RandomWordAug(action=action, *args, **kwargs)
+
+    def __call__(self, text: str):
+        augmented_text = self.augmenter.augment(text)
+        return augmented_text
+
+
 class MLMAugmenter(ABC):
     def __init__(self, model=None, tokenizer=None, fraction: float = 0.12, min_mask: int = 1, max_mask: int = 100,
                  topk: int = 5, uniform: bool = False, device=None):

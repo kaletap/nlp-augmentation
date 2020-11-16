@@ -9,15 +9,20 @@ class DatasetWithAugmentation(Dataset):
         self.dataset = dataset
         self.augmenter = augmenter
         self.augmentation_prob = augmentation_prob
+        self.n_errors = 0
+        self.max_errors = 50
 
     def __getitem__(self, i):
         item = self.dataset[i]
         if random.random() < self.augmentation_prob:
             try:
                 item['text'] = self.augmenter(item['text'])
-            except:
-                print(f"Something went wrong when augmenting item number {i}")
+            except Exception as e:
+                print(f"Something went wrong when augmenting item number {i}: {e}")
                 print(item)
+                self.n_errors += 1
+                if self.n_errors > self.max_errors:
+                    raise Exception(f"Number of error exceeded {self.max_errors}!")
         return item
 
     def __len__(self):
