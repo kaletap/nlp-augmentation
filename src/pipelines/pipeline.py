@@ -256,7 +256,7 @@ class QuestionAnsweringPipeline(BlurrPipeline):
                            splitter=transforms.ColSplitter(col="is_valid"),
                            n_inp=1)
 
-        dls = dblock.dataloaders(processed_df, bs=params["bs"])
+        dls = dblock.dataloaders(processed_df, num_workers=0, bs=params["bs"])
         return dls
 
 
