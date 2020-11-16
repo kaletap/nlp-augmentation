@@ -254,10 +254,9 @@ class QuestionAnsweringPipeline(BlurrPipeline):
                            get_x=get_x,
                            get_y=[transforms.ColReader(params["y_col"][0]), transforms.ColReader(params["y_col"][1])],
                            splitter=transforms.ColSplitter(col="is_valid"),
-                           num_workers=0,
                            n_inp=1)
 
-        dls = dblock.dataloaders(processed_df, bs=params["bs"])
+        dls = dblock.dataloaders(processed_df, num_workers=0, bs=params["bs"])
         return dls
 
 
