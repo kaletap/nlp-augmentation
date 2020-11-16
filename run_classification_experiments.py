@@ -11,31 +11,20 @@ from transformers import (
     TrainingArguments
 )
 
-from src.augmentation import MLMInsertionAugmenter, MLMSubstitutionAugmenter
 from src.data_processing import DataCollator
 from src.pipelines.configs import dataset_configs
+from src.pipelines.configs import swap_config as augmentation_config
 from src.pipelines.datasets import get_datasets
 
 
 # Setup
 ROOT_OUTPUT_DIR = '/kaggle/temp/'
-save_dir = "."
-AUGMENTATION = "mlm_insertion"
-AUGMENTATION_PROB = 0.7
-augmentation_config = {
-    "fraction": 0.12,
-    "min_mask": 1,
-    "max_mask": 100,
-    "topk": 10,
-    "uniform": False
-}
+SAVE_DIR = "."
 
 
 def run_exp():
     tokenizer = AutoTokenizer.from_pretrained('roberta-base', use_fast=False)
-    # we can also use task fine-tuned language model if we want
-    mlm_model = AutoModelForMaskedLM.from_pretrained('roberta-base', return_dict=True).eval()
-    augmenter = MLMInsertionAugmenter(mlm_model, tokenizer, **augmentation_config)
+    augmenter = augmentation_config["class"](**augmentation_config["augmenter_parameters"])
 
     accuracies = defaultdict(list)
     print(augmentation_config)
@@ -51,7 +40,7 @@ def run_exp():
                 train_size,
                 val_size=config["val_size"],
                 test_size=config["test_size"],
-                augmentation_prob=AUGMENTATION_PROB,
+                augmentation_prob=augmentation_config["augmentation_prob"],
                 load_test=config["load_test"],
                 text_columns=config["text_colname"],
                 sep_token=tokenizer.sep_token
@@ -70,11 +59,11 @@ def run_exp():
                 100_000: 3
             }.get(train_size, 6)
 
-            output_dir = os.path.join(ROOT_OUTPUT_DIR, f'{name}_{AUGMENTATION}_train_size_{train_size}')
+            output_dir = os.path.join(ROOT_OUTPUT_DIR, f'{name}_{augmentation_config["name"]}_train_size_{train_size}')
             # https://huggingface.co/transformers/main_classes/trainer.html#trainingarguments
             training_args = TrainingArguments(
                 output_dir=output_dir,
-                logging_dir=save_dir,
+                logging_dir=SAVE_DIR,
                 num_train_epochs=num_train_epochs,
                 learning_rate=3e-5,
                 weight_decay=0.01,
@@ -104,10 +93,10 @@ def run_exp():
 
             test_result = trainer.evaluate(test_dataset)
             accuracies[name].append(test_result['eval_accuracy'])
-            with open(os.path.join(save_dir, f'{name}_{AUGMENTATION}_train_size_{train_size}.json'), 'w') as f:
+            with open(os.path.join(SAVE_DIR, f'{name}_{augmentation_config["name"]}_train_size_{train_size}.json'), 'w') as f:
                 json.dump(test_result, f, indent=4)
             print(test_result)
-            with open(os.path.join(save_dir, 'accuracies.json'), 'w') as f:
+            with open(os.path.join(SAVE_DIR, 'accuracies.json'), 'w') as f:
                 json.dump(accuracies, f, indent=4)
             print(accuracies)
             shutil.rmtree(output_dir, ignore_errors=True)

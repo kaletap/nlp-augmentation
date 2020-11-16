@@ -5,6 +5,7 @@ import transformers
 from blurr.modeling import summarization as model_sum
 from blurr.modeling import question_answering as model_qa
 
+from src.augmentation import *
 from src.pipelines.metrics import compute_binary_metrics, compute_multiclass_metrics
 from src.pipelines import pipeline
 
@@ -195,3 +196,43 @@ dataset_configs = {
 keys = ag_news_config.keys()
 for config in dataset_configs.values():
     assert config.keys() == keys
+
+# Augmentation configs
+
+mlm_insertion_config = {
+    "name": "mlm_insertion",
+    "class": MLMInsertionAugmenter,
+    "augmenter_parameters": {
+        "fraction": 0.12,
+        "min_mask": 1,
+        "max_mask": 100,
+        "topk": 10,
+        "uniform": False
+    },
+    "augmentation_prob": 0.7,
+}
+
+mlm_substitution_config = {
+    "name": "mlm_substitution",
+    "class": MLMSubstitutionAugmenter,
+    "augmenter_parameters": {
+        "fraction": 0.12,
+        "min_mask": 1,
+        "max_mask": 100,
+        "topk": 10,
+        "uniform": False
+    },
+    "augmentation_prob": 0.7,
+}
+
+swap_config = {
+    "name": "random_swap",
+    "class": RandomWordAugmenter,
+    "augmenter_parameters": {
+        "action": "swap",
+        "aug_p": 0.2,
+        "aug_min": 1,
+        "aug_max": 10,
+    },
+    "augmentation_prob": 0.7
+}

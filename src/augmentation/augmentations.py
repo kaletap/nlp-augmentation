@@ -30,7 +30,7 @@ class RuleBasedAugmenter:
         return augmented_text
 
 
-class RandomWordAug:
+class RandomWordAugmenter:
     """
     https://nlpaug.readthedocs.io/en/latest/augmenter/word/random.html
     """
