@@ -37,7 +37,7 @@ class RandomWordAugmenter:
     def __init__(self, action="swap", *args, **kwargs):
         self.augmenter = naw.RandomWordAug(action=action, *args, **kwargs)
 
-    def __cal__(self, text: str):
+    def __call__(self, text: str):
         augmented_text = self.augmenter.augment(text)
         return augmented_text
 
