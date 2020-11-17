@@ -2,6 +2,7 @@ import json
 import os
 import shutil
 from collections import defaultdict
+from datetime import datetime
 
 from transformers import (
     AutoModelForMaskedLM,
@@ -45,6 +46,7 @@ def run_exp():
                 text_columns=config["text_colname"],
                 sep_token=tokenizer.sep_token
             )
+            print("Time:", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
             print(f"Train size: {len(train_dataset)}, Validation size: {len(val_dataset)}, Test size: {len(test_dataset)}")
             print(train_dataset[0])
             print(val_dataset[0])
