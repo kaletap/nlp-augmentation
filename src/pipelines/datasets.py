@@ -22,7 +22,7 @@ class DatasetWithAugmentation(Dataset):
                 print(item)
                 self.n_errors += 1
                 if self.n_errors > self.max_errors:
-                    raise Exception(f"Number of error exceeded {self.max_errors}!")
+                    raise Exception(f"Number of errors exceeded {self.max_errors}!")
         return item
 
     def __len__(self):
