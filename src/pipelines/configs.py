@@ -236,3 +236,15 @@ swap_config = {
     },
     "augmentation_prob": 0.7
 }
+
+bart_augmenter_config = {
+    "name": "bart_augmentation",
+    "class": BartAugmenter,
+    "augmenter_parameters": {
+        "fraction": 0.2,
+        "min_mask": 1,
+        "lambda_": 2.5,
+        "num_beams": 1
+    },
+    "augmentation_prob": 0.7,
+}
