@@ -37,16 +37,21 @@ summary_bart_config = {
     "opt_func": optimizer.ranger,
     "loss_func": model_sum.HF_MaskedLMLoss,
     "metrics": (),
-    "bs": 2,
+    "bs": 8,
     "pre_config_overwrite": {'max_length': 130, 'min_length': 30},
     "train_params": {
         "all": {
-            "epochs": (2,),
+            "epochs": (1,),
+            "unfreeze": (),
+            "lr": (),
+        },
+        100: {
+            "epochs": (10,),
             "unfreeze": (),
             "lr": (),
         },
         1000: {
-            "epochs": (10,),
+            "epochs": (8,),
             "unfreeze": (),
             "lr": (),
         },
@@ -73,8 +78,13 @@ qa_bert_config = {
             "unfreeze": (),
             "lr": (),
         },
-        1000: {
+        100: {
             "epochs": (10,),
+            "unfreeze": (),
+            "lr": (),
+        },
+        1000: {
+            "epochs": (8,),
             "unfreeze": (),
             "lr": (),
         },
@@ -99,8 +109,8 @@ common_config = {
 }
 
 experiments_setup = {
-    "train_samples": ("all", 1000, 5000), #["all", 10, 100, 1000, 10000],
-    "augmentations": ("no_aug", "rules", "LM"),# "vae", "rules", "style_transfer"],
+    "train_samples": (100, 1000, 5000, "all"), #["all", 10, 100, 1000, 10000],
+    "augmentations": ("rules", "LM", "no_aug"),# "vae", "rules", "style_transfer"],
     "seeds": (9, 11, 21, 37),# 9, 11, 21, 37]
     "tasks": {
         "summarization": ((pipeline.SummarizationPipeline, {**summary_bart_config, **cnn_dailymail_config, **common_config})),
