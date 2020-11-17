@@ -1,19 +1,15 @@
+import argparse
 from copy import deepcopy
-from pathlib import Path
+
+
 from src.pipelines import configs
+from src import training_utils
 
 
-def fill_paths(task, train_samples, aug, seed, config):
-    for path in ["model_save_paths", "metrics_save_paths", "predictions_save_paths", "targets_save_paths"]:
-        config[path] = Path(config[path].format(
-            task=task,
-            dataset="_".join(config["ds_name"]),
-            model=config["pretrained_model_name"],
-            train_samples=str(train_samples),
-            aug=aug,
-            seed=str(seed))
-        )
-    return config
+parser = argparse.ArgumentParser()
+parser.add_argument("--task", type=str, default="qa",
+                    choices=list(configs.experiments_setup["tasks"].keys()), help="type of task")
+args = parser.parse_args()
 
 
 def run_exp(task, main_config):
@@ -25,11 +21,10 @@ def run_exp(task, main_config):
             for aug in main_config["augmentations"]:
                 og_config["augmentation"] = aug
                 config = deepcopy(og_config)
-                config = fill_paths(task, train_samples, aug, seed, config)
+                config = training_utils.fill_paths(task, train_samples, aug, seed, config)
                 pipe = pipe_cls.from_name(exp_parameters=config)
                 pipe.run()
 
 
 if __name__ == "__main__":
-    run_exp(task="qa", main_config=configs.experiments_setup)
-    # run_exp(task="summarization", main_config=configs.experiments_setup)
+    run_exp(task=args.task, main_config=configs.experiments_setup)
