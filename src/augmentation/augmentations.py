@@ -214,8 +214,8 @@ class BartAugmenter:
                 i += 1
 
         masked_text = " ".join(masked_words)
-        inputs = self.tokenizer(masked_text, max_length=1024, return_tensors='pt')
-        input_ids = torch.tensor(inputs["input_ids"], device=self.device)
+        inputs = self.tokenizer(masked_text, max_length=1024, truncation=True, return_tensors="pt").to(self.device)
+        input_ids = inputs["input_ids"].to(self.device)
 
         # Generate seq2seq output
         with torch.no_grad():
