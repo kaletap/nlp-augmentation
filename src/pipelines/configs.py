@@ -128,7 +128,7 @@ ag_news_config = {
     "val_size": 5_000,
     "test_size": None,
     "load_test": True,
-    "batch_size": 8,
+    "batch_size": 16,
     "eval_batch_size": 8,
     "gradient_accumulation_steps": 2,
     "metrics_function": compute_multiclass_metrics,
