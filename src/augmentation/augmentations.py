@@ -138,6 +138,8 @@ class MLMInsertionAugmenter(MLMAugmenter):
 
 class MLMSubstitutionAugmenter(MLMInsertionAugmenter):
     def __call__(self, text: str):
+        import pdb;
+        pdb.set_trace()
         if self.fraction == 0:
             return text
         words = np.array(text.split(), dtype='object')
