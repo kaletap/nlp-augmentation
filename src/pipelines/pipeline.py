@@ -1,5 +1,6 @@
 from abc import abstractmethod
 from functools import partial
+import os
 
 import datasets
 import torch
@@ -88,7 +89,7 @@ class BlurrPipeline:
 
     @classmethod
     @abstractmethod
-    def get_databunch_from_name(cls, ds, arch, tokenizer, params):
+    def get_databunch_from_name(cls, ds, arch, tokenizer, params, data_path):
         pass
 
     @classmethod
@@ -97,7 +98,7 @@ class BlurrPipeline:
         pass
 
     @classmethod
-    def from_name(cls, exp_parameters):
+    def from_name(cls, data_path, exp_parameters):
         model_name, model_class = exp_parameters["pretrained_model_name"], exp_parameters["model_class"]
         print(f"create pipeline from name")
         arch, config, tokenizer, model = cls.get_model_from_name(model_name, model_class)
@@ -107,6 +108,7 @@ class BlurrPipeline:
             arch=arch,
             tokenizer=tokenizer,
             params=exp_parameters,
+            data_path=data_path,
         )
         print(f"dataset {exp_parameters['ds_name']} loaded")
         learn = cls.get_learner(
@@ -211,9 +213,10 @@ class QuestionAnsweringPipeline(BlurrPipeline):
         return [question_anwsering.HF_QstAndAnsModelCallbackWithMetrics]
 
     @classmethod
-    def get_databunch_from_name(cls, ds, arch, tokenizer, params):
+    def get_databunch_from_name(cls, ds, arch, tokenizer, params, data_path):
         dataset_name, aug_type, csv_path = params["ds_name"], params["augmentation"], params["load_template_path"]
         dataset_name = '-'.join(dataset_name)
+        csv_path = os.path.join(data_path, csv_path)
         vocab = list(range(params["max_len"]))
         df = cls.load_data(ds, params["train_samples"], dataset_name, aug_type, csv_path)
         processed_df = data_processing.processing_from_name(df, ds, tokenizer, params["max_len"])
@@ -263,8 +266,9 @@ class SummarizationPipeline(BlurrPipeline):
         return [model_cb]
 
     @classmethod
-    def get_databunch_from_name(cls, ds, arch, tokenizer, params):
+    def get_databunch_from_name(cls, ds, arch, tokenizer, params, data_path):
         dataset_name, aug_type, csv_path = params["ds_name"], params["augmentation"], params["load_template_path"]
+        csv_path = os.path.join(data_path, csv_path)
         dataset_name = '-'.join(dataset_name)
         df = cls.load_data(ds, params["train_samples"], dataset_name, aug_type, csv_path)
         processed_df = data_processing.processing_from_name(df, ds, tokenizer, params["max_len"])
