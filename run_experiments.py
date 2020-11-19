@@ -3,7 +3,7 @@ from copy import deepcopy
 
 
 from src.pipelines import configs
-from src import training_utils
+from src.training_utils import training_utils
 
 
 parser = argparse.ArgumentParser()
