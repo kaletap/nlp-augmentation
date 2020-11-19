@@ -122,6 +122,7 @@ experiments_setup = {
 
 ag_news_config = {
     "dataset_name": "ag_news",
+    "mlm_relative_path": "ag-news-roberta/checkpoint-1400",
     "num_labels": 4,
     "text_colname": "text",
     "label_colname": "label",
@@ -137,6 +138,7 @@ ag_news_config = {
 
 imdb_config = {
     "dataset_name": "imdb",
+    "mlm_relative_path": "imdb-roberta/checkpoint-300",
     "num_labels": 2,
     "text_colname": "text",
     "label_colname": "label",
@@ -152,6 +154,7 @@ imdb_config = {
 
 snli_config = {
     "dataset_name": "snli",
+    "mlm_relative_path": "snli-roberta/checkpoint-6400",
     "num_labels": 3,
     "text_colname": ["premise", "hypothesis"],
     "label_colname": "label",
@@ -167,6 +170,7 @@ snli_config = {
 
 twitter_config = {
     "dataset_name": "sentiment140",
+    "mlm_relative_path": "twitter-roberta/checkpoint-2600",
     "num_labels": 2,
     "text_colname": "text",
     "label_colname": "sentiment",
@@ -182,6 +186,7 @@ twitter_config = {
 
 yelp_config = {
     "dataset_name": "yelp_polarity",
+    "mlm_relative_path": "yelp-roberta/checkpoint-350",
     "num_labels": 2,
     "text_colname": "text",
     "label_colname": "label",
@@ -192,7 +197,7 @@ yelp_config = {
     "eval_batch_size": 8,
     "gradient_accumulation_steps": 2,
     "metrics_function": compute_binary_metrics,
-    "train_sizes": [20, 100, 1_000]
+    "train_sizes": [20, 100, 1_000, 2_500]
 }
 
 dataset_configs = {
@@ -207,11 +212,13 @@ keys = ag_news_config.keys()
 for config in dataset_configs.values():
     assert config.keys() == keys
 
-# Augmentation configs
+# Augmentation configs (some Augmenter arguments depend on the dataset, for example pretrained model)
+# That's why some of them have to be specified in the code
 
 mlm_insertion_config = {
     "name": "mlm_insertion",
     "class": MLMInsertionAugmenter,
+    "use_finetuned": True,
     "augmenter_parameters": {
         "fraction": 0.12,
         "min_mask": 1,
@@ -225,6 +232,7 @@ mlm_insertion_config = {
 mlm_substitution_config = {
     "name": "mlm_substitution",
     "class": MLMSubstitutionAugmenter,
+    "use_finetuned": True,
     "augmenter_parameters": {
         "fraction": 0.12,
         "min_mask": 1,
@@ -257,4 +265,11 @@ bart_augmenter_config = {
         "num_beams": 1
     },
     "augmentation_prob": 0.7,
+}
+
+no_augmenter_config = {
+    "name": "no_augmentation",
+    "class": NoAugmenter,
+    "augmenter_parameters": dict(),
+    "augmentation_prob": 0.0,
 }
