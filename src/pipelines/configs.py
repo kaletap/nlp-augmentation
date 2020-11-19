@@ -41,25 +41,25 @@ summary_bart_config = {
     "pre_config_overwrite": {'max_length': 130, 'min_length': 30},
     "train_params": {
         "all": {
-            "epochs": (1,),
+            "epochs": (3,),
             "unfreeze": (),
             "lr": (),
         },
-        100: {
-            "epochs": (10,),
-            "unfreeze": (),
-            "lr": (),
-        },
-        1000: {
-            "epochs": (8,),
-            "unfreeze": (),
-            "lr": (),
-        },
-        5000: {
-            "epochs": (5,),
-            "unfreeze": (),
-            "lr": (),
-        },
+        # 100: {
+        #     "epochs": (3,),
+        #     "unfreeze": (),
+        #     "lr": (),
+        # },
+        # 1000: {
+        #     "epochs": (3,),
+        #     "unfreeze": (),
+        #     "lr": (),
+        # },
+        # 5000: {
+        #     "epochs": (5,),
+        #     "unfreeze": (),
+        #     "lr": (),
+        # },
     }
 }
 
@@ -78,25 +78,26 @@ qa_bert_config = {
             "unfreeze": (),
             "lr": (),
         },
-        100: {
-            "epochs": (10,),
-            "unfreeze": (),
-            "lr": (),
-        },
-        1000: {
-            "epochs": (8,),
-            "unfreeze": (),
-            "lr": (),
-        },
-        5000: {
-            "epochs": (5,),
-            "unfreeze": (),
-            "lr": (),
-        },
+        # 100: {
+        #     "epochs": (10,),
+        #     "unfreeze": (),
+        #     "lr": (),
+        # },
+        # 1000: {
+        #     "epochs": (8,),
+        #     "unfreeze": (),
+        #     "lr": (),
+        # },
+        # 5000: {
+        #     "epochs": (5,),
+        #     "unfreeze": (),
+        #     "lr": (),
+        # },
     }
 }
 
 common_config = {
+    "load_template_path": "{dataset_name}_{split}_{sample_count}_aug-{aug_type}.csv",
     "save_predictions": True,
     "model_save_paths":
         "model_checkpoint_{task}_ds-{dataset}_model-{model}_train_size-{train_samples}_aug-{aug}_seed-{seed}.pkl",

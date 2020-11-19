@@ -34,7 +34,7 @@ class BlurrPipeline:
 
     def train(self):
         print("training started")
-        params = self.parameters["train_params"][self.parameters["train_samples"]]
+        params = self.parameters["train_params"]["all"]# self.parameters["train_samples"]
         unfrozen_epochs = params["epochs"][0]
         params["epochs"] = params["epochs"][1:]
 
@@ -88,7 +88,7 @@ class BlurrPipeline:
 
     @classmethod
     @abstractmethod
-    def get_databunch_from_name(cls, ds, aug_fn, arch, tokenizer, params):
+    def get_databunch_from_name(cls, ds, arch, tokenizer, params):
         pass
 
     @classmethod
@@ -100,13 +100,10 @@ class BlurrPipeline:
     def from_name(cls, exp_parameters):
         model_name, model_class = exp_parameters["pretrained_model_name"], exp_parameters["model_class"]
         print(f"create pipeline from name")
-        aug_fn = augmentations.get_augmentation_fn(exp_parameters["augmentation"])
-        print(f"augmentation {exp_parameters['augmentation']} loaded")
         arch, config, tokenizer, model = cls.get_model_from_name(model_name, model_class)
         print(f"model {model_name} loaded")
         databunch = cls.get_databunch_from_name(
             ds=exp_parameters["ds_name"],
-            aug_fn=aug_fn,
             arch=arch,
             tokenizer=tokenizer,
             params=exp_parameters,
@@ -131,11 +128,15 @@ class BlurrPipeline:
         return hf_arch, hf_config, hf_tokenizer, hf_model
 
     @classmethod
-    def load_data(cls, dataset, train_samples):
-        data_train = datasets.load_dataset(*dataset, split="train")
-        data_test = datasets.load_dataset(*dataset, split="validation")
-        df_train = pd.DataFrame(data_train)
-        df_test = pd.DataFrame(data_test)
+    def load_data(cls, dataset, train_samples, dataset_name, aug_type, csv_path):
+        train_csv_path = csv_path.format(
+            dataset_name=dataset_name, split="train", sample_count=train_samples, aug_type=aug_type)
+        test_csv_path = csv_path.format(
+            dataset_name=dataset_name, split="validation", sample_count="all", aug_type="no_aug")
+
+        df_train = pd.read_csv(train_csv_path)
+        df_test = pd.read_csv(test_csv_path)
+
         if train_samples != "all":
             df_train = df_train[:train_samples]
             assert len(df_train) == train_samples, \
@@ -210,9 +211,11 @@ class QuestionAnsweringPipeline(BlurrPipeline):
         return [question_anwsering.HF_QstAndAnsModelCallbackWithMetrics]
 
     @classmethod
-    def get_databunch_from_name(cls, ds, aug_fn, arch, tokenizer, params):
+    def get_databunch_from_name(cls, ds, arch, tokenizer, params):
+        dataset_name, aug_type, csv_path = params["ds_name"], params["augmentation"], params["load_template_path"]
+        dataset_name = '-'.join(dataset_name)
         vocab = list(range(params["max_len"]))
-        df = cls.load_data(ds, params["train_samples"])
+        df = cls.load_data(ds, params["train_samples"], dataset_name, aug_type, csv_path)
         processed_df = data_processing.processing_from_name(df, ds, tokenizer, params["max_len"])
 
         trunc_strat = 'only_second' if (tokenizer.padding_side == 'right') else 'only_first'
@@ -227,15 +230,8 @@ class QuestionAnsweringPipeline(BlurrPipeline):
             block.CategoryBlock(vocab=vocab)
         )
 
-        get_question_auged = aug_fn(params["x_col"][0])
-        get_context_auged = aug_fn(params["x_col"][1])
-
-        get_x = partial(
-            training_utils.get_qa_x,
-            aug_question_fn=get_question_auged,
-            aug_context_fn=get_context_auged,
-            tokenizer=tokenizer
-        )
+        def get_x(x):
+            return (x.question, x.context) if (tokenizer.padding_side == 'right') else (x.context, x.question)
 
         dblock = block.DataBlock(blocks=blocks,
                            get_x=get_x,
@@ -267,8 +263,10 @@ class SummarizationPipeline(BlurrPipeline):
         return [model_cb]
 
     @classmethod
-    def get_databunch_from_name(cls, ds, aug_fn, arch, tokenizer, params):
-        df = cls.load_data(ds, params["train_samples"])
+    def get_databunch_from_name(cls, ds, arch, tokenizer, params):
+        dataset_name, aug_type, csv_path = params["ds_name"], params["augmentation"], params["load_template_path"]
+        dataset_name = '-'.join(dataset_name)
+        df = cls.load_data(ds, params["train_samples"], dataset_name, aug_type, csv_path)
         processed_df = data_processing.processing_from_name(df, ds, tokenizer, params["max_len"])
 
         hf_batch_tfm = model_sum.HF_SummarizationBatchTransform(
@@ -277,10 +275,9 @@ class SummarizationPipeline(BlurrPipeline):
             max_length=params["max_len"]
         )
         blocks = (data_core.HF_TextBlock(hf_batch_tfm=hf_batch_tfm), imports.noop)
-        get_x = aug_fn(params["x_col"])
 
         dblock = block.DataBlock(blocks=blocks,
-                           get_x=get_x,
+                           get_x=transforms.ColReader(params["x_col"]),
                            get_y=transforms.ColReader(params["y_col"]),
                            splitter=transforms.ColSplitter(col="is_valid"))
 
