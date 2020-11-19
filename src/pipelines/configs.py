@@ -122,7 +122,7 @@ experiments_setup = {
 
 ag_news_config = {
     "dataset_name": "ag_news",
-    "mlm_relative_path": "ag_news_roberta/checkpoint-1400",
+    "mlm_relative_path": "ag-news-roberta/checkpoint-1400",
     "num_labels": 4,
     "text_colname": "text",
     "label_colname": "label",
@@ -138,7 +138,7 @@ ag_news_config = {
 
 imdb_config = {
     "dataset_name": "imdb",
-    "mlm_relative_path": "imdb_roberta/checkpoint-300",
+    "mlm_relative_path": "imdb-roberta/checkpoint-300",
     "num_labels": 2,
     "text_colname": "text",
     "label_colname": "label",
@@ -154,7 +154,7 @@ imdb_config = {
 
 snli_config = {
     "dataset_name": "snli",
-    "mlm_relative_path": "snli_roberta/checkpoint-6400",
+    "mlm_relative_path": "snli-roberta/checkpoint-6400",
     "num_labels": 3,
     "text_colname": ["premise", "hypothesis"],
     "label_colname": "label",
@@ -170,7 +170,7 @@ snli_config = {
 
 twitter_config = {
     "dataset_name": "sentiment140",
-    "mlm_relative_path": "twitter_roberta/checkpoint-2600",
+    "mlm_relative_path": "twitter-roberta/checkpoint-2600",
     "num_labels": 2,
     "text_colname": "text",
     "label_colname": "sentiment",
@@ -186,7 +186,7 @@ twitter_config = {
 
 yelp_config = {
     "dataset_name": "yelp_polarity",
-    "mlm_relative_path": "yelp_roberta/checkpoint-350",
+    "mlm_relative_path": "yelp-roberta/checkpoint-350",
     "num_labels": 2,
     "text_colname": "text",
     "label_colname": "label",
