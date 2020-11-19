@@ -133,7 +133,7 @@ ag_news_config = {
     "eval_batch_size": 8,
     "gradient_accumulation_steps": 2,
     "metrics_function": compute_multiclass_metrics,
-    "train_sizes": []
+    "train_sizes": [2500]
 }
 
 imdb_config = {
@@ -149,7 +149,7 @@ imdb_config = {
     "eval_batch_size": 8,
     "gradient_accumulation_steps": 2,
     "metrics_function": compute_binary_metrics,
-    "train_sizes": []
+    "train_sizes": [2500]
 }
 
 snli_config = {
@@ -165,7 +165,7 @@ snli_config = {
     "eval_batch_size": 8,
     "gradient_accumulation_steps": 1,
     "metrics_function": compute_multiclass_metrics,
-    "train_sizes": []
+    "train_sizes": [2500]
 }
 
 twitter_config = {
@@ -181,7 +181,7 @@ twitter_config = {
     "eval_batch_size": 16,
     "gradient_accumulation_steps": 1,
     "metrics_function": compute_binary_metrics,
-    "train_sizes": [20, 100, 1000, 2_500]
+    "train_sizes": [2_500]
 }
 
 yelp_config = {
@@ -197,7 +197,7 @@ yelp_config = {
     "eval_batch_size": 8,
     "gradient_accumulation_steps": 2,
     "metrics_function": compute_binary_metrics,
-    "train_sizes": [20, 100, 1_000, 2_500]
+    "train_sizes": [2_500]
 }
 
 dataset_configs = {

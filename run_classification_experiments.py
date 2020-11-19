@@ -22,7 +22,7 @@ from src.pipelines.datasets import get_datasets
 ROOT_OUTPUT_DIR = '/kaggle/temp'
 SAVE_DIR = "."
 MLM_ROOT_PATH = "/kaggle/input"
-USE_FINETUNED_MODEL_FOR_CLASSIFICATION = True
+USE_FINETUNED_MODEL_FOR_CLASSIFICATION = False
 
 
 def run_exp():
@@ -77,6 +77,8 @@ def run_exp():
                 10_000: 6,
                 100_000: 3
             }.get(train_size, 6)
+            if train_size > 50_000:
+                num_train_epochs = 3
 
             output_dir = os.path.join(ROOT_OUTPUT_DIR, f'{name}_{augmentation_config["name"]}_train_size_{train_size}')
             # https://huggingface.co/transformers/main_classes/trainer.html#trainingarguments
