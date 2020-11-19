@@ -37,14 +37,22 @@ def augment_qa(df, idx, row, col, aug_fn):
 
     answer["answer_start"][0] = answer_start
     df.loc[idx, col] = auged_txt
-    return df
+    # return df
+
+
+def augment_summ(df, idx, row, col, aug_fn):
+    aug_text = aug_fn(row[col])
+    df.loc[idx, col] = aug_text
+    # return df
 
 
 def augment_text_df(df, task, x_cols, aug_fn):
     for idx, row in tqdm(df.iterrows()):
         for col in x_cols:
             if task == "qa":
-                df = augment_qa(df, idx, row, col, aug_fn)
+                augment_qa(df, idx, row, col, aug_fn)
+            elif task == "summarization":
+                augment_summ(df, idx, row, col, aug_fn)
             else:
                 raise ValueError(f"Task type {task} is not supported")
     return df
