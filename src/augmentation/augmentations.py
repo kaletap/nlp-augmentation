@@ -138,8 +138,6 @@ class MLMInsertionAugmenter(MLMAugmenter):
 
 class MLMSubstitutionAugmenter(MLMInsertionAugmenter):
     def __call__(self, text: str):
-        import pdb;
-        pdb.set_trace()
         if self.fraction == 0:
             return text
         words = np.array(text.split(), dtype='object')
@@ -157,15 +155,19 @@ class MLMSubstitutionAugmenter(MLMInsertionAugmenter):
         words[masked_indices] = self.mask_token
         masked_text = " ".join(words)
 
-        tokenizer_output = self.tokenizer([masked_text], truncation=True)
-        input_ids = torch.tensor(tokenizer_output['input_ids']).to(self.device)
-        with torch.no_grad():
-            output = self.model(input_ids)
-            predicted_logits = output.logits[input_ids == self.mask_token_id]
-            predicted_probas = predicted_logits.softmax(1)
-        predicted_words = [self.sample_word(probas, black_word=word).strip() for probas, word in zip(predicted_probas, masked_words)]
-        words[masked_indices] = predicted_words
-        new_text = " ".join(words)
+        try:
+            tokenizer_output = self.tokenizer([masked_text], truncation=True)
+            input_ids = torch.tensor(tokenizer_output['input_ids']).to(self.device)
+            with torch.no_grad():
+                output = self.model(input_ids)
+                predicted_logits = output.logits[input_ids == self.mask_token_id]
+                predicted_probas = predicted_logits.softmax(1)
+            predicted_words = [self.sample_word(probas, black_word=word).strip() for probas, word in zip(predicted_probas, masked_words)]
+            words[masked_indices] = predicted_words
+            new_text = " ".join(words)
+        except:
+            import pdb;
+            pdb.set_trace()
         return new_text
 
     def substitute_word(self, word):
