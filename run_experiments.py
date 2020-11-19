@@ -10,7 +10,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--task", type=str, default="qa",
                     choices=list(configs.experiments_setup["tasks"].keys()), help="type of task")
 parser.add_argument("--data_path", type=str, default="",
-                    choices=list(configs.experiments_setup["tasks"].keys()), help="path to folder with data")
+                    help="path to folder with data")
 args = parser.parse_args()
 
 
