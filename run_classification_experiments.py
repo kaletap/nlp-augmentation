@@ -39,7 +39,7 @@ def run_exp():
                           f"pretrained model")
         if use_finetuned and mlm_relative_path:
             mlm_path = os.path.join(MLM_ROOT_PATH, mlm_relative_path)
-            print(f"Loading model from {mlm_path}")
+            print(f"Loading model for augmentation from {mlm_path}")
             augmenter = augmentation_config["class"](model_name_or_path=mlm_path, **augmentation_config["augmenter_parameters"])
         else:
             augmenter = augmentation_config["class"](**augmentation_config["augmenter_parameters"])
@@ -47,7 +47,7 @@ def run_exp():
             data_collator = DataCollator(tokenizer, text_colname="text", label_colname=config["label_colname"])
             if USE_FINETUNED_MODEL_FOR_CLASSIFICATION:
                 model_name_or_path = os.path.join(MLM_ROOT_PATH, mlm_relative_path)
-                print(f"Loading model from {model_name_or_path}")
+                print(f"Loading model for classification from {model_name_or_path}")
             else:
                 model_name_or_path = "roberta-base"
             model = AutoModelForSequenceClassification.from_pretrained(model_name_or_path, return_dict=True, num_labels=config["num_labels"])
