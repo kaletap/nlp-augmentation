@@ -40,4 +40,4 @@ for (dataset_name, split, ds_params) in PARAMS_LIST:
             print("not trimming ds cuz sample_count: " + sample_count)
         auged_df = data_downloading.augment_data(
             df_subset, aug_type=aug["type"], aug_repeat=aug["repeat"], x_cols=x_cols)
-        auged_df.to_csv(f"./data/{dataset_name}_{split}_{sample_count}_aug-{aug['type']}_repeat-{aug['repeat']}.csv")
+        auged_df.to_csv(f"{dataset_name}_{split}_{sample_count}_aug-{aug['type']}_repeat-{aug['repeat']}.csv")
