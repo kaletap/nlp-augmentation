@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from functools import partial
 import heapq
 import itertools
 import random
@@ -8,6 +9,21 @@ import numpy as np
 import torch
 from fastai.data import transforms
 from transformers import AutoModelForMaskedLM, AutoModelForSeq2SeqLM, AutoTokenizer
+
+
+def get_augmentation_fn(aug_name, wrapped=True):
+    if aug_name == "no_aug":
+        return transforms.ColReader
+    elif aug_name == "rules":
+        augmenter = RuleBasedAugmenter()
+    elif aug_name == "LM":
+        augmenter = MLMSubstitutionAugmenter()
+    else:
+        raise ValueError(f"{aug_name} is not a supported augmentation mode")
+    if wrapped:
+        return partial(AugmenterWrapper, augmenter=augmenter)
+    else:
+        return augmenter
 
 
 class AugmenterWrapper:

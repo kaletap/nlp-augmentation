@@ -18,7 +18,7 @@ from blurr.modeling import core as model_core
 from src.data_processing import data_processing
 from src.model import question_anwsering
 from src.augmentation import augmentations
-from src import training_utils
+from src.training_utils import training_utils
 
 
 class BlurrPipeline:
@@ -100,7 +100,7 @@ class BlurrPipeline:
     def from_name(cls, exp_parameters):
         model_name, model_class = exp_parameters["pretrained_model_name"], exp_parameters["model_class"]
         print(f"create pipeline from name")
-        aug_fn = cls.get_augmentation_fn(exp_parameters["augmentation"])
+        aug_fn = augmentations.get_augmentation_fn(exp_parameters["augmentation"])
         print(f"augmentation {exp_parameters['augmentation']} loaded")
         arch, config, tokenizer, model = cls.get_model_from_name(model_name, model_class)
         print(f"model {model_name} loaded")
@@ -162,18 +162,6 @@ class BlurrPipeline:
         learn.create_opt()
         learn.freeze()
         return learn
-
-    @classmethod
-    def get_augmentation_fn(cls, aug_name):
-        if aug_name == "no_aug":
-            return transforms.ColReader
-        elif aug_name == "rules":
-            augmenter = augmentations.RuleBasedAugmenter()
-        elif aug_name == "LM":
-            augmenter = augmentations.MLMSubstitutionAugmenter()
-        else:
-            raise ValueError(f"{aug_name} is not a supported augmentation mode")
-        return partial(augmentations.AugmenterWrapper, augmenter=augmenter)
 
     def get_dataset(self, ds_type):
         if 'train' == ds_type:
@@ -241,7 +229,6 @@ class QuestionAnsweringPipeline(BlurrPipeline):
 
         get_question_auged = aug_fn(params["x_col"][0])
         get_context_auged = aug_fn(params["x_col"][1])
-
 
         get_x = partial(
             training_utils.get_qa_x,

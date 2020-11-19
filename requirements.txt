@@ -4,3 +4,4 @@ nlpaug==1.1.0
 ohmeow-blurr==0.0.14
 torch==1.6.0
 transformers==3.4.0
+tqdm
