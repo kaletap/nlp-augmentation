@@ -43,8 +43,8 @@ class RandomWordAugmenter:
 
 
 class MLMAugmenter(ABC):
-    def __init__(self, model=None, tokenizer=None, fraction: float = 0.12, min_mask: int = 1, max_mask: int = 100,
-                 topk: int = 5, uniform: bool = False, device=None):
+    def __init__(self, model_name_or_path=None, tokenizer=None, fraction: float = 0.12, min_mask: int = 1,
+                 max_mask: int = 100, topk: int = 5, uniform: bool = False, device=None):
         """
         :param model: huggingface/transformers model for masked language modeling
             e.g model = RobertaForMaskedLM.from_pretrained('roberta-base', return_dict=True)
@@ -58,8 +58,11 @@ class MLMAugmenter(ABC):
         :param device: torch.device
         """
         self.device = device or torch.device('cuda')
-        model = model or AutoModelForMaskedLM.from_pretrained('roberta-base', return_dict=True)
+        model_name_or_path = model_name_or_path or 'roberta-base'
+        model = AutoModelForMaskedLM.from_pretrained(model_name_or_path, return_dict=True)
         self.model = model.eval().to(self.device)
+        # Warning: if a model_name_or_path is a path to a model different than roberta, than default tokenizer will
+        # be incompatible
         tokenizer = tokenizer or AutoTokenizer.from_pretrained('roberta-base', use_fast=False)
         self.tokenizer = tokenizer
         self.vocab_words = [self.tokenizer.convert_tokens_to_string(word).strip() for word in tokenizer.get_vocab().keys()]

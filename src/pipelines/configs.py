@@ -122,6 +122,7 @@ experiments_setup = {
 
 ag_news_config = {
     "dataset_name": "ag_news",
+    "mlm_relative_path": "ag_news_roberta/checkpoint-1400",
     "num_labels": 4,
     "text_colname": "text",
     "label_colname": "label",
@@ -137,6 +138,7 @@ ag_news_config = {
 
 imdb_config = {
     "dataset_name": "imdb",
+    "mlm_relative_path": "imdb_roberta/checkpoint-300",
     "num_labels": 2,
     "text_colname": "text",
     "label_colname": "label",
@@ -152,6 +154,7 @@ imdb_config = {
 
 snli_config = {
     "dataset_name": "snli",
+    "mlm_relative_path": "snli_roberta/checkpoint-6400",
     "num_labels": 3,
     "text_colname": ["premise", "hypothesis"],
     "label_colname": "label",
@@ -167,6 +170,7 @@ snli_config = {
 
 twitter_config = {
     "dataset_name": "sentiment140",
+    "mlm_relative_path": "twitter_roberta/checkpoint-2600",
     "num_labels": 2,
     "text_colname": "text",
     "label_colname": "sentiment",
@@ -182,6 +186,7 @@ twitter_config = {
 
 yelp_config = {
     "dataset_name": "yelp_polarity",
+    "mlm_relative_path": "yelp_roberta/checkpoint-350",
     "num_labels": 2,
     "text_colname": "text",
     "label_colname": "label",
@@ -207,11 +212,13 @@ keys = ag_news_config.keys()
 for config in dataset_configs.values():
     assert config.keys() == keys
 
-# Augmentation configs
+# Augmentation configs (some Augmenter arguments depend on the dataset, for example pretrained model)
+# That's why some of them have to be specified in the code
 
 mlm_insertion_config = {
     "name": "mlm_insertion",
     "class": MLMInsertionAugmenter,
+    "use_finetuned": True,
     "augmenter_parameters": {
         "fraction": 0.12,
         "min_mask": 1,
@@ -225,6 +232,7 @@ mlm_insertion_config = {
 mlm_substitution_config = {
     "name": "mlm_substitution",
     "class": MLMSubstitutionAugmenter,
+    "use_finetuned": True,
     "augmenter_parameters": {
         "fraction": 0.12,
         "min_mask": 1,
