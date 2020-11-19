@@ -8,8 +8,9 @@ def processing_from_name(df, ds_name, tokenizer, max_len):
 
 
 def squad_v2_preprocessing(df, tokenizer, max_len):
-    df["is_impossible"] = df["answers"].apply(lambda x: len(x["answer_start"]) == 0)
-    df = df[df.is_impossible == False]
+    import pdb;pdb.set_trace()
+    # df["is_impossible"] = df["answers"].apply(lambda x: len(x["answer_start"]) == 0)
+    # df = df[df.is_impossible == False]
 
     df = df.apply(partial(fixed_pre_process_squad, hf_tokenizer=tokenizer), axis=1)
     df = df[df["tokenized_input"].apply(lambda x: len(x) < max_len)]
