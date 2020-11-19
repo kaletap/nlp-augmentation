@@ -140,22 +140,22 @@ class MLMSubstitutionAugmenter(MLMInsertionAugmenter):
     def __call__(self, text: str):
         if self.fraction == 0:
             return text
-        words = np.array(text.split(), dtype='object')
-        n_mask = max(self.min_mask, int(len(words) * self.fraction))
-        n_mask = min(n_mask, self.max_mask)
-        # offset, since lenght might increase after tokenization
-        max_masked_idx = min(self.tokenizer.model_max_length // 2, len(words) + 1)
-        vocab_word_indices = [i for i, word in itertools.islice(enumerate(words), max_masked_idx)
-                              if self.substitute_word(word)]
-        if not vocab_word_indices:
-            return text
-        n_mask = min(n_mask, len(vocab_word_indices))
-        masked_indices = np.sort(np.random.choice(vocab_word_indices, size=n_mask, replace=False))
-        masked_words = words[masked_indices]
-        words[masked_indices] = self.mask_token
-        masked_text = " ".join(words)
-
         try:
+            words = np.array(text.split(), dtype='object')
+            n_mask = max(self.min_mask, int(len(words) * self.fraction))
+            n_mask = min(n_mask, self.max_mask)
+            # offset, since lenght might increase after tokenization
+            max_masked_idx = min(self.tokenizer.model_max_length // 2, len(words) + 1)
+            vocab_word_indices = [i for i, word in itertools.islice(enumerate(words), max_masked_idx)
+                                  if self.substitute_word(word)]
+            if not vocab_word_indices:
+                return text
+            n_mask = min(n_mask, len(vocab_word_indices))
+            masked_indices = np.sort(np.random.choice(vocab_word_indices, size=n_mask, replace=False))
+            masked_words = words[masked_indices]
+            words[masked_indices] = self.mask_token
+            masked_text = " ".join(words)
+
             tokenizer_output = self.tokenizer([masked_text], truncation=True)
             input_ids = torch.tensor(tokenizer_output['input_ids']).to(self.device)
             with torch.no_grad():
@@ -166,8 +166,7 @@ class MLMSubstitutionAugmenter(MLMInsertionAugmenter):
             words[masked_indices] = predicted_words
             new_text = " ".join(words)
         except:
-            import pdb;
-            pdb.set_trace()
+            new_text = text
         return new_text
 
     def substitute_word(self, word):
