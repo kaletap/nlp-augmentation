@@ -14,7 +14,7 @@ from transformers import (
 
 from src.data_processing import DataCollator
 from src.pipelines.configs import dataset_configs
-from src.pipelines.configs import mlm_insertion_config as augmentation_config
+from src.pipelines.configs import no_augmenter_config as augmentation_config
 from src.pipelines.datasets import get_datasets
 
 
@@ -22,6 +22,7 @@ from src.pipelines.datasets import get_datasets
 ROOT_OUTPUT_DIR = '/kaggle/temp'
 SAVE_DIR = "."
 MLM_ROOT_PATH = "/kaggle/input"
+USE_FINETUNED_MODEL_FOR_CLASSIFICATION = True
 
 
 def run_exp():
@@ -44,7 +45,12 @@ def run_exp():
             augmenter = augmentation_config["class"](**augmentation_config["augmenter_parameters"])
         for train_size in config["train_sizes"]:
             data_collator = DataCollator(tokenizer, text_colname="text", label_colname=config["label_colname"])
-            model = AutoModelForSequenceClassification.from_pretrained('roberta-base', return_dict=True, num_labels=config["num_labels"])
+            if USE_FINETUNED_MODEL_FOR_CLASSIFICATION:
+                model_name_or_path = os.path.join(MLM_ROOT_PATH, mlm_relative_path)
+                print(f"Loading model from {model_name_or_path}")
+            else:
+                model_name_or_path = "roberta-base"
+            model = AutoModelForSequenceClassification.from_pretrained(model_name_or_path, return_dict=True, num_labels=config["num_labels"])
 
             train_dataset, val_dataset, test_dataset = get_datasets(
                 config["dataset_name"],

@@ -266,3 +266,10 @@ bart_augmenter_config = {
     },
     "augmentation_prob": 0.7,
 }
+
+no_augmenter_config = {
+    "name": "no_augmentation",
+    "class": NoAugmenter,
+    "augmenter_parameters": dict(),
+    "augmentation_prob": 0.0,
+}

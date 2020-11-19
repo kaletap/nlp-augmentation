@@ -245,3 +245,8 @@ class BartAugmenter:
                                                    skip_special_tokens=True, clean_up_tokenization_spaces=False)
 
         return generated_text
+
+
+class NoAugmenter:
+    def __call__(self, text: str):
+        return text
