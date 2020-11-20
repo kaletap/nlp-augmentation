@@ -4,28 +4,28 @@ import pandas as pd
 from src.training_utils import data_downloading
 
 PARAMS_LIST = [
-    [
-        ("cnn_dailymail", '3.0.0'),
-        "train",
-        [
-            # (100, "summarization", ("article",), {"type": "no_aug", "repeat": 100}),
-            # (1000, "summarization", ("article",), {"type": "no_aug", "repeat": 10}),
-            # (5000, "summarization", ("article",), {"type": "no_aug", "repeat": 2}),
-            # (100, "summarization", ("article",), {"type": "rules", "repeat": 100}),
-            # (1000, "summarization", ("article",), {"type": "rules", "repeat": 10}),
-            # (5000, "summarization", ("article",), {"type": "rules", "repeat": 2}),
-            (100, "summarization", ("article",), {"type": "LM", "repeat": 100}),
-            (1000, "summarization", ("article",), {"type": "LM", "repeat": 10}),
-            (5000, "summarization", ("article",), {"type": "LM", "repeat": 2}),
-        ],
-    ],
     # [
     #     ("cnn_dailymail", '3.0.0'),
-    #     "validation",
+    #     "train",
     #     [
-    #         (10000, "summarization", ("article",), {"type": "no_aug", "repeat": 1}),
+    #         # (100, "summarization", ("article",), {"type": "no_aug", "repeat": 100}),
+    #         # (1000, "summarization", ("article",), {"type": "no_aug", "repeat": 10}),
+    #         # (5000, "summarization", ("article",), {"type": "no_aug", "repeat": 2}),
+    #         # (100, "summarization", ("article",), {"type": "rules", "repeat": 100}),
+    #         # (1000, "summarization", ("article",), {"type": "rules", "repeat": 10}),
+    #         # (5000, "summarization", ("article",), {"type": "rules", "repeat": 2}),
+    #         (100, "summarization", ("article",), {"type": "LM", "repeat": 100}),
+    #         (1000, "summarization", ("article",), {"type": "LM", "repeat": 10}),
+    #         (5000, "summarization", ("article",), {"type": "LM", "repeat": 2}),
     #     ],
     # ],
+    [
+        ("cnn_dailymail", '3.0.0'),
+        "validation",
+        [
+            (10000, "summarization", ("article",), {"type": "no_aug", "repeat": 1}),
+        ],
+    ],
     # [
     #     ("squad_v2",),
     #     "train",

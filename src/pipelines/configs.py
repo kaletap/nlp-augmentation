@@ -41,25 +41,10 @@ summary_bart_config = {
     "pre_config_overwrite": {'max_length': 130, 'min_length': 30},
     "train_params": {
         "all": {
-            "epochs": (6,),
+            "epochs": (12,),
             "unfreeze": (),
             "lr": (),
         },
-        # 100: {
-        #     "epochs": (3,),
-        #     "unfreeze": (),
-        #     "lr": (),
-        # },
-        # 1000: {
-        #     "epochs": (3,),
-        #     "unfreeze": (),
-        #     "lr": (),
-        # },
-        # 5000: {
-        #     "epochs": (5,),
-        #     "unfreeze": (),
-        #     "lr": (),
-        # },
     }
 }
 
@@ -74,25 +59,10 @@ qa_bert_config = {
     "pre_config_overwrite": {},
     "train_params": {
         "all": {
-            "epochs": (6,),
+            "epochs": (12,),
             "unfreeze": (),
             "lr": (),
         },
-        # 100: {
-        #     "epochs": (10,),
-        #     "unfreeze": (),
-        #     "lr": (),
-        # },
-        # 1000: {
-        #     "epochs": (8,),
-        #     "unfreeze": (),
-        #     "lr": (),
-        # },
-        # 5000: {
-        #     "epochs": (5,),
-        #     "unfreeze": (),
-        #     "lr": (),
-        # },
     }
 }
 
