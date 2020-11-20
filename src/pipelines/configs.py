@@ -69,8 +69,9 @@ qa_bert_config = {
 common_config = {
     "load_template_path": "{dataset_name}_{split}_{sample_count}_aug-{aug_type}.csv",
     "save_predictions": True,
+    "save_model": False,
     "model_save_paths":
-        "model_checkpoint_{task}_ds-{dataset}_model-{model}_train_size-{train_samples}_aug-{aug}_seed-{seed}.pkl",
+        "model_checkpoint_{task}_ds-{dataset}_model-{model}_train_size-{train_samples}_aug-{aug}_seed-{seed}",
     "metrics_save_paths":
         "metrics_{task}_ds-{dataset}_model-{model}_train_size-{train_samples}_aug-{aug}_seed-{seed}.csv",
     "predictions_save_paths":

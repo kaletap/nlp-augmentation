@@ -11,11 +11,14 @@ parser.add_argument("--task", type=str, default="qa",
                     choices=list(configs.experiments_setup["tasks"].keys()), help="type of task")
 parser.add_argument("--data_path", type=str, default="",
                     help="path to folder with data")
+parser.add_argument("--cache_dir", type=str, default="~/.cache",
+                    help="path to folder caching folder")
 args = parser.parse_args()
 
 
-def run_exp(task, data_path, main_config):
+def run_exp(task, data_path, cache_dir, main_config):
     pipe_cls, og_config = main_config["tasks"][task]
+    og_config["cache_dir"] = cache_dir
     for seed in main_config["seeds"]:
         og_config["seed"] = seed
         for train_samples in main_config["train_samples"]:
@@ -29,4 +32,4 @@ def run_exp(task, data_path, main_config):
 
 
 if __name__ == "__main__":
-    run_exp(task=args.task, data_path=args.data_path, main_config=configs.experiments_setup)
+    run_exp(task=args.task, data_path=args.data_path, cache_dir=args.cache_dir, main_config=configs.experiments_setup)

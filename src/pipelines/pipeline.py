@@ -49,9 +49,10 @@ class BlurrPipeline:
             self.learn.fit_one_cycle(epoch, lr_max=training_utils.get_lr(lr, lr_divs[0],  lr_divs[1]))
 
     def save_model(self):
-        print("saving model started")
-        self.learn.remove_cb(progress.CSVLogger)
-        self.learn.save(self.parameters["model_save_paths"])
+        if self.parameters["save_model"]:
+            print("saving model started")
+            self.learn.remove_cb(progress.CSVLogger)
+            self.learn.save(self.parameters["model_save_paths"])
 
     def save_metrics(self):
         print("saving metrics started")
@@ -101,7 +102,7 @@ class BlurrPipeline:
     def from_name(cls, data_path, exp_parameters):
         model_name, model_class = exp_parameters["pretrained_model_name"], exp_parameters["model_class"]
         print(f"create pipeline from name")
-        arch, config, tokenizer, model = cls.get_model_from_name(model_name, model_class)
+        arch, config, tokenizer, model = cls.get_model_from_name(model_name, model_class, exp_parameters["cache_dir"])
         print(f"model {model_name} loaded")
         databunch = cls.get_databunch_from_name(
             ds=exp_parameters["ds_name"],
@@ -122,11 +123,13 @@ class BlurrPipeline:
         return cls(learn, exp_parameters)
 
     @classmethod
-    def get_model_from_name(cls, pretrained_model_name, model_class):
+    def get_model_from_name(cls, pretrained_model_name, model_class, cache_dir):
         hf_arch, hf_config, hf_tokenizer, hf_model = utils.BLURR_MODEL_HELPER.get_hf_objects(
             pretrained_model_name,
             model_cls=model_class,
+            cache_dir=cache_dir,
         )
+
         return hf_arch, hf_config, hf_tokenizer, hf_model
 
     @classmethod
