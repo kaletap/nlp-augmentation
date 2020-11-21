@@ -80,7 +80,7 @@ class BlurrPipeline:
             preds.to_csv(self.parameters["targets_save_paths"])
 
     @abstractmethod
-    def get_batch_predictions(self, ds_type, tokenizer):
+    def get_batch_predictions(self, preds, sample, tokenizer):
         pass
 
     @classmethod

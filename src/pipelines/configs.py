@@ -31,7 +31,7 @@ squad_v2_config = {
 }
 
 summary_bart_config = {
-    "pretrained_model_name": "facebook/bart-large-cnn",
+    "pretrained_model_name": "facebook/bart-large-cnn", # to sie wypierdala jako czesc sciezki
     "model_class": transformers.BartForConditionalGeneration,
     "task": "summarization",
     "opt_func": optimizer.ranger,

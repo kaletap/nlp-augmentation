@@ -11,12 +11,13 @@ def get_qa_x(x, aug_question_fn, aug_context_fn, tokenizer):
         else (aug_context_fn(x), aug_question_fn(x))
 
 
-def fill_paths(task, train_samples, aug, seed, config):
-    for path in ["model_save_paths", "metrics_save_paths", "predictions_save_paths", "targets_save_paths"]:
+def fill_paths(task, train_samples, aug, seed, config,
+               paths=("model_save_paths", "metrics_save_paths", "predictions_save_paths", "targets_save_paths")):
+    for path in paths:
         config[path] = Path(config[path].format(
             task=task,
             dataset="_".join(config["ds_name"]),
-            model=config["pretrained_model_name"],
+            model=config["pretrained_model_name"].replace("/", "-"),
             train_samples=str(train_samples),
             aug=aug,
             repeat=config["repeat"],
