@@ -137,7 +137,7 @@ class BlurrPipeline:
         train_csv_path = csv_path.format(
             dataset_name=dataset, split="train", sample_count=train_samples, aug_type=aug_type, repeat=repeat)
         test_csv_path = csv_path.format(
-            dataset_name=dataset, split="validation", sample_count="all", aug_type="no_aug", repeat=repeat)
+            dataset_name=dataset, split="validation", sample_count="all", aug_type="no_aug", repeat=1)
 
         df_train = pd.read_csv(train_csv_path)
         df_test = pd.read_csv(test_csv_path)

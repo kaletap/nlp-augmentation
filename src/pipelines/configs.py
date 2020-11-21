@@ -68,7 +68,7 @@ qa_bert_config = {
 
 common_config = {
     "load_template_path": "{dataset_name}_{split}_{sample_count}_aug-{aug_type}_repeat-{repeat}.csv",
-    "save_predictions": True,
+    "save_predictions": False,
     "save_model": False,
     "model_save_paths":
         "model_checkpoint_{task}_ds-{dataset}_model-{model}_train_size-{train_samples}_aug-{aug}_repeat-{repeat}_seed-{seed}",
@@ -81,9 +81,9 @@ common_config = {
 }
 
 experiments_setup = {
-    "train_samples": ((100, 10), (100, 50), (100, 100) ), #["all", 10, 100, 1000, 10000], # (org_smpl_count, aug_repeat)
-    "augmentations": ("no_aug", ),# "vae", "rules", "style_transfer"],
-    "seeds": (9, 11, 21, 37, ),# 9, 11, 21, 37]
+    "train_samples": ((100, 100), (1000, 10), (5000, 2)), #["all", 10, 100, 1000, 10000], # (org_smpl_count, aug_repeat)
+    "augmentations": ("rules", "no_aug"),# "vae", "rules", "style_transfer"],
+    "seeds": (9, 11),# 9, 11, 21, 37]
     "tasks": {
         "summarization": ((pipeline.SummarizationPipeline, {**summary_bart_config, **cnn_dailymail_config, **common_config})),
         "qa": ((pipeline.QuestionAnsweringPipeline, {**qa_bert_config, **squad_v2_config, **common_config}))
