@@ -113,7 +113,8 @@ class MLMInsertionAugmenter(MLMAugmenter):
         if self.fraction == 0:
             return text
         words = np.array(text.split(), dtype='object')
-        n_mask = max(self.min_mask, int(len(words) * self.fraction))
+        max_len = self.tokenizer.model_max_length
+        n_mask = max(self.min_mask, int(min(max_len, len(words)) * self.fraction))
         n_mask = min(n_mask, self.max_mask)
         max_masked_idx = min(self.tokenizer.model_max_length // 2 - n_mask,
                              len(words) + 1)  # offset, since lenght might increase after tokenization
@@ -142,10 +143,11 @@ class MLMSubstitutionAugmenter(MLMInsertionAugmenter):
             return text
         try:
             words = np.array(text.split(), dtype='object')
-            n_mask = max(self.min_mask, int(len(words) * self.fraction))
+            max_len = self.tokenizer.model_max_length
+            n_mask = max(self.min_mask, int(min(max_len, len(words)) * self.fraction))
             n_mask = min(n_mask, self.max_mask)
             # offset, since lenght might increase after tokenization
-            max_masked_idx = min(self.tokenizer.model_max_length // 2, len(words) + 1)
+            max_masked_idx = min(max_len // 2, len(words) + 1)
             vocab_word_indices = [i for i, word in itertools.islice(enumerate(words), max_masked_idx)
                                   if self.substitute_word(word)]
             if not vocab_word_indices:
@@ -165,7 +167,9 @@ class MLMSubstitutionAugmenter(MLMInsertionAugmenter):
             predicted_words = [self.sample_word(probas, black_word=word).strip() for probas, word in zip(predicted_probas, masked_words)]
             words[masked_indices] = predicted_words
             new_text = " ".join(words)
-        except:
+        except Exception as e:
+            print(f"Something went wrong during augmentation: {e}")
+            print("Text:", text)
             new_text = text
         return new_text
 
