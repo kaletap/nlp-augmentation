@@ -19,6 +19,7 @@ def fill_paths(task, train_samples, aug, seed, config):
             model=config["pretrained_model_name"],
             train_samples=str(train_samples),
             aug=aug,
-            seed=str(seed))
+            repeat=config["repeat"],
+            seed=str(seed)),
         )
     return config
