@@ -23,12 +23,14 @@ def run_exp(task, data_path, cache_dir, main_config):
         og_config["seed"] = seed
         for train_samples in main_config["train_samples"]:
             og_config["train_samples"] = train_samples
-            for aug in main_config["augmentations"]:
-                og_config["augmentation"] = aug
-                config = deepcopy(og_config)
-                config = training_utils.fill_paths(task, train_samples, aug, seed, config)
-                pipe = pipe_cls.from_name(data_path=data_path, exp_parameters=config)
-                pipe.run()
+            for reps in main_config["repeats"]:
+                og_config["repeat"] = reps
+                for aug in main_config["augmentations"]:
+                    og_config["augmentation"] = aug
+                    config = deepcopy(og_config)
+                    config = training_utils.fill_paths(task, train_samples, aug, seed, config)
+                    pipe = pipe_cls.from_name(data_path=data_path, exp_parameters=config)
+                    pipe.run()
 
 
 if __name__ == "__main__":

@@ -41,7 +41,7 @@ summary_bart_config = {
     "pre_config_overwrite": {'max_length': 130, 'min_length': 30},
     "train_params": {
         "all": {
-            "epochs": (6,),
+            "epochs": (3,),
             "unfreeze": (),
             "lr": (),
         },
@@ -67,27 +67,28 @@ qa_bert_config = {
 }
 
 common_config = {
-    "load_template_path": "{dataset_name}_{split}_{sample_count}_aug-{aug_type}.csv",
+    "load_template_path": "{dataset_name}_{split}_{sample_count}_aug-{aug_type}_repeat-{repeat}.csv",
     "save_predictions": True,
     "save_model": False,
     "model_save_paths":
-        "model_checkpoint_{task}_ds-{dataset}_model-{model}_train_size-{train_samples}_aug-{aug}_seed-{seed}",
+        "model_checkpoint_{task}_ds-{dataset}_model-{model}_train_size-{train_samples}_aug-{aug}_repeat-{repeat}_seed-{seed}",
     "metrics_save_paths":
-        "metrics_{task}_ds-{dataset}_model-{model}_train_size-{train_samples}_aug-{aug}_seed-{seed}.csv",
+        "metrics_{task}_ds-{dataset}_model-{model}_train_size-{train_samples}_aug-{aug}_repeat-{repeat}_seed-{seed}.csv",
     "predictions_save_paths":
-        "predictions_{task}_ds-{dataset}_model-{model}_train_size-{train_samples}_aug-{aug}_seed-{seed}.csv",
+        "predictions_{task}_ds-{dataset}_model-{model}_train_size-{train_samples}_aug-{aug}_repeat-{repeat}_seed-{seed}.csv",
     "targets_save_paths":
-        "targets_{task}_ds-{dataset}_model-{model}_train_size-{train_samples}_aug-{aug}_seed-{seed}.csv",
+        "targets_{task}_ds-{dataset}_model-{model}_train_size-{train_samples}_aug-{aug}_repeat-{repeat}_seed-{seed}.csv",
 }
 
 experiments_setup = {
-    "train_samples": ("all", ), #["all", 10, 100, 1000, 10000],
+    "train_samples": (100, ), #["all", 10, 100, 1000, 10000],
     "augmentations": ("no_aug", ),# "vae", "rules", "style_transfer"],
     "seeds": (9, ),# 9, 11, 21, 37]
     "tasks": {
         "summarization": ((pipeline.SummarizationPipeline, {**summary_bart_config, **cnn_dailymail_config, **common_config})),
         "qa": ((pipeline.QuestionAnsweringPipeline, {**qa_bert_config, **squad_v2_config, **common_config}))
-    }
+    },
+    "repeats": (10, 50, 100),
 }
 
 # Classification datasets configs

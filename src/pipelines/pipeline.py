@@ -133,11 +133,11 @@ class BlurrPipeline:
         return hf_arch, hf_config, hf_tokenizer, hf_model
 
     @classmethod
-    def load_data(cls, dataset, train_samples, dataset_name, aug_type, csv_path):
+    def load_data(cls, dataset, train_samples, aug_type, csv_path, repeat):
         train_csv_path = csv_path.format(
-            dataset_name=dataset_name, split="train", sample_count=train_samples, aug_type=aug_type)
+            dataset_name=dataset, split="train", sample_count=train_samples, aug_type=aug_type, repeat=repeat)
         test_csv_path = csv_path.format(
-            dataset_name=dataset_name, split="validation", sample_count="all", aug_type="no_aug")
+            dataset_name=dataset, split="validation", sample_count="all", aug_type="no_aug", repeat=repeat)
 
         df_train = pd.read_csv(train_csv_path)
         df_test = pd.read_csv(test_csv_path)
@@ -217,11 +217,11 @@ class QuestionAnsweringPipeline(BlurrPipeline):
 
     @classmethod
     def get_databunch_from_name(cls, ds, arch, tokenizer, params, data_path):
-        dataset_name, aug_type, csv_path = params["ds_name"], params["augmentation"], params["load_template_path"]
-        dataset_name = '-'.join(dataset_name)
+        aug_type, csv_path, repeat = params["augmentation"], params["load_template_path"], params["repeat"]
+        ds = '-'.join(ds)
         csv_path = os.path.join(data_path, csv_path)
         vocab = list(range(params["max_len"]))
-        df = cls.load_data(ds, params["train_samples"], dataset_name, aug_type, csv_path)
+        df = cls.load_data(ds, params["train_samples"], aug_type, csv_path, repeat)
         processed_df = data_processing.processing_from_name(df, ds, tokenizer, params["max_len"])
 
         trunc_strat = 'only_second' if (tokenizer.padding_side == 'right') else 'only_first'
@@ -270,10 +270,10 @@ class SummarizationPipeline(BlurrPipeline):
 
     @classmethod
     def get_databunch_from_name(cls, ds, arch, tokenizer, params, data_path):
-        dataset_name, aug_type, csv_path = params["ds_name"], params["augmentation"], params["load_template_path"]
+        aug_type, csv_path, repeat = params["augmentation"], params["load_template_path"], params["repeat"]
         csv_path = os.path.join(data_path, csv_path)
-        dataset_name = '-'.join(dataset_name)
-        df = cls.load_data(ds, params["train_samples"], dataset_name, aug_type, csv_path)
+        ds = '-'.join(ds)
+        df = cls.load_data(ds, params["train_samples"], aug_type, csv_path, repeat)
         processed_df = data_processing.processing_from_name(df, ds, tokenizer, params["max_len"])
 
         hf_batch_tfm = model_sum.HF_SummarizationBatchTransform(
