@@ -14,7 +14,7 @@ from transformers import (
 
 from src.data_processing import DataCollator
 from src.pipelines.configs import dataset_configs
-from src.pipelines.configs import no_augmenter_config as augmentation_config
+from src.pipelines.configs import mlm_substitution_config as augmentation_config
 from src.pipelines.datasets import get_datasets
 
 
@@ -116,7 +116,7 @@ def run_exp():
             accuracies[name].append(test_result['eval_accuracy'])
             with open(os.path.join(SAVE_DIR, f'{name}_{augmentation_config["name"]}_train_size_{train_size}.json'), 'w') as f:
                 json.dump(test_result, f, indent=4)
-            print(test_result)
+            print(test_result)  # trainer.evaluate may print this as well (hence we see the same print two times)
             with open(os.path.join(SAVE_DIR, 'accuracies.json'), 'w') as f:
                 json.dump(accuracies, f, indent=4)
             print(accuracies)

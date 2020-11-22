@@ -59,8 +59,8 @@ class RandomWordAugmenter:
 
 
 class MLMAugmenter(ABC):
-    def __init__(self, model_name_or_path=None, tokenizer=None, fraction: float = 0.12, min_mask: int = 1,
-                 max_mask: int = 100, topk: int = 5, uniform: bool = False, device=None):
+    def __init__(self, model_name_or_path=None, tokenizer=None, min_fraction: float = 0.05, max_fraction: float = 0.5,
+                 min_mask: int = 1, max_mask: int = 100, topk: int = 15, uniform: bool = False, device=None):
         """
         :param model: huggingface/transformers model for masked language modeling
             e.g model = RobertaForMaskedLM.from_pretrained('roberta-base', return_dict=True)
@@ -88,7 +88,9 @@ class MLMAugmenter(ABC):
         self.min_mask = min_mask
         self.max_mask = max_mask
         self.uniform = uniform
-        self.fraction = fraction
+        assert self.max_fraction >= self.min_fraction
+        self.min_fraction = min_fraction
+        self.max_fraction = max_fraction
 
     def sample_word(self, predicted_probas, black_word=None):
         if hasattr(predicted_probas, 'tolist'):
@@ -110,11 +112,12 @@ class MLMAugmenter(ABC):
 
 class MLMInsertionAugmenter(MLMAugmenter):
     def __call__(self, text: str):
-        if self.fraction == 0:
+        if self.max_fraction == 0:
             return text
         words = np.array(text.split(), dtype='object')
         max_len = self.tokenizer.model_max_length
-        n_mask = max(self.min_mask, int(min(max_len, len(words)) * self.fraction))
+        fraction = self.min_fraction + (self.max_fraction - self.max_fraction)*np.random.beta(2, 12)
+        n_mask = max(self.min_mask, int(min(max_len, len(words)) * fraction))
         n_mask = min(n_mask, self.max_mask)
         max_masked_idx = min(self.tokenizer.model_max_length // 2 - n_mask,
                              len(words) + 1)  # offset, since lenght might increase after tokenization
@@ -139,12 +142,13 @@ class MLMInsertionAugmenter(MLMAugmenter):
 
 class MLMSubstitutionAugmenter(MLMInsertionAugmenter):
     def __call__(self, text: str):
-        if self.fraction == 0:
+        if self.max_fraction == 0:
             return text
         try:
             words = np.array(text.split(), dtype='object')
             max_len = self.tokenizer.model_max_length
-            n_mask = max(self.min_mask, int(min(max_len, len(words)) * self.fraction))
+            fraction = self.min_fraction + (self.max_fraction - self.max_fraction) * np.random.beta(2, 12)
+            n_mask = max(self.min_mask, int(min(max_len, len(words)) * fraction))
             n_mask = min(n_mask, self.max_mask)
             # offset, since lenght might increase after tokenization
             max_masked_idx = min(max_len // 2, len(words) + 1)
