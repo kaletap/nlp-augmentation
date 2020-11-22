@@ -89,7 +89,7 @@ class MLMAugmenter(ABC):
         self.min_mask = min_mask
         self.max_mask = max_mask
         self.uniform = uniform
-        assert self.max_fraction >= self.min_fraction
+        assert max_fraction >= min_fraction
         self.min_fraction = min_fraction
         self.max_fraction = max_fraction
 
