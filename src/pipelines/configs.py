@@ -190,7 +190,7 @@ for config in dataset_configs.values():
 mlm_insertion_config = {
     "name": "mlm_insertion",
     "class": MLMInsertionAugmenter,
-    "use_finetuned": True,
+    "use_finetuned": False,
     "augmenter_parameters": {
         "min_mask": 1,
         "max_mask": 100,
@@ -202,7 +202,7 @@ mlm_insertion_config = {
 mlm_substitution_config = {
     "name": "mlm_substitution",
     "class": MLMSubstitutionAugmenter,
-    "use_finetuned": True,
+    "use_finetuned": False,
     "augmenter_parameters": {
         "min_mask": 1,
         "max_mask": 100,
