@@ -187,7 +187,7 @@ class MLMSubstitutionAugmenter(MLMInsertionAugmenter):
 
 class BartAugmenter:
     def __init__(self, model=None, tokenizer=None, fraction: float = 0.2, min_mask: int = 1, max_mask: int = 100,
-                 lambda_: float = 2.5, num_beams: int = 1, device=None):
+                 lambda_: float = 3, num_beams: int = 1, device=None):
         """
         :param model: huggingface/transformers model for masked language modeling
             e.g model = BartForConditionalGeneration.from_pretrained('facebook/bart-large', return_dict=True)
@@ -201,9 +201,9 @@ class BartAugmenter:
         :param device: torch.device
         """
         self.device = device or torch.device('cuda')
-        model = model or AutoModelForSeq2SeqLM.from_pretrained('facebook/bart-large', return_dict=True)
+        model = model or AutoModelForSeq2SeqLM.from_pretrained('facebook/bart-base', return_dict=True)
         self.model = model.eval().to(self.device)
-        tokenizer = tokenizer or AutoTokenizer.from_pretrained('facebook/bart-large', use_fast=False)
+        tokenizer = tokenizer or AutoTokenizer.from_pretrained('facebook/bart-base', use_fast=False)
         self.tokenizer = tokenizer
         self.mask_token = tokenizer.mask_token
         self.min_mask = min_mask
@@ -212,12 +212,13 @@ class BartAugmenter:
         self.lambda_ = lambda_
         self.num_beams = num_beams
 
-    def __call__(self, text: str):
+    def __call__(self, text: str, fraction: float = None):
         if self.fraction == 0:
             return text
 
         words = text.split()
-        n_mask = max(self.min_mask, round(len(words) * self.fraction))
+        fraction = fraction or self.fraction
+        n_mask = max(self.min_mask, round(len(words) * fraction))
         n_mask = min(n_mask, self.max_mask)
         # offset, since lenght might increase after tokenization
         max_masked_idx = min(self.tokenizer.model_max_length - 50, len(words))
