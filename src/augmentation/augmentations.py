@@ -107,17 +107,17 @@ class MLMAugmenter(ABC):
         return word
 
     @abstractmethod
-    def __call__(self, text: str):
+    def __call__(self, text: str, fraction: float = None):
         pass
 
 
 class MLMInsertionAugmenter(MLMAugmenter):
-    def __call__(self, text: str):
+    def __call__(self, text: str, fraction: float = None):
         if self.max_fraction == 0:
             return text
         words = np.array(text.split(), dtype='object')
         max_len = self.tokenizer.model_max_length
-        fraction = self.min_fraction + (self.max_fraction - self.min_fraction)*np.random.random()
+        fraction = fraction or self.min_fraction + (self.max_fraction - self.min_fraction)*np.random.random()
         n_mask = max(self.min_mask, int(min(max_len, len(words)) * fraction))
         n_mask = min(n_mask, self.max_mask)
         max_masked_idx = min(self.tokenizer.model_max_length // 2 - n_mask,
@@ -142,13 +142,13 @@ class MLMInsertionAugmenter(MLMAugmenter):
 
 
 class MLMSubstitutionAugmenter(MLMInsertionAugmenter):
-    def __call__(self, text: str):
+    def __call__(self, text: str, fraction: float = None):
         if self.max_fraction == 0:
             return text
         try:
             words = np.array(text.split(), dtype='object')
             max_len = self.tokenizer.model_max_length
-            fraction = self.min_fraction + (self.max_fraction - self.min_fraction) * np.random.random()
+            fraction = fraction or self.min_fraction + (self.max_fraction - self.min_fraction) * np.random.random()
             n_mask = max(self.min_mask, int(min(max_len, len(words)) * fraction))
             n_mask = min(n_mask, self.max_mask)
             # offset, since lenght might increase after tokenization
