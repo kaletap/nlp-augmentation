@@ -14,15 +14,15 @@ from transformers import (
 
 from src.data_processing import DataCollator
 from src.pipelines.configs import dataset_configs
-from src.pipelines.configs import mlm_substitution_config as augmentation_config
+from src.pipelines.configs import no_augmenter_config as augmentation_config
 from src.pipelines.datasets import get_datasets
 
 
 # Setup
-ROOT_OUTPUT_DIR = '/kaggle/temp'
-SAVE_DIR = "."
-MLM_ROOT_PATH = "/kaggle/input"
-USE_FINETUNED_MODEL_FOR_CLASSIFICATION = False
+ROOT_OUTPUT_DIR = "/content/drive/MyDrive/Colab Notebooks/nlp/results"
+SAVE_DIR = ROOT_OUTPUT_DIR#"."
+MLM_ROOT_PATH = "/content/drive/MyDrive/Colab Notebooks/nlp/pretrained_models"
+USE_FINETUNED_MODEL_FOR_CLASSIFICATION = True
 
 
 def run_exp():
@@ -70,7 +70,7 @@ def run_exp():
             print(test_dataset[0])
 
             num_train_epochs = {
-                20: 20,
+                20: 15,
                 100: 15,
                 1000: 7,
                 2_500: 6,
