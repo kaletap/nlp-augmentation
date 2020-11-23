@@ -21,7 +21,7 @@ from src.pipelines.datasets import get_datasets
 # Setup
 ROOT_OUTPUT_DIR = "/kaggle/working/"  # "/content/drive/MyDrive/Colab Notebooks/nlp/results"
 SAVE_DIR = "."  # ROOT_OUTPUT_DIR
-MLM_ROOT_PATH = "kaggle/input/"  # "/content/drive/MyDrive/Colab Notebooks/nlp/pretrained_models"
+MLM_ROOT_PATH = "/kaggle/input/"  # "/content/drive/MyDrive/Colab Notebooks/nlp/pretrained_models"
 USE_FINETUNED_MODEL_FOR_CLASSIFICATION = True
 
 
