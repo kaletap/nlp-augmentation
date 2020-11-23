@@ -59,15 +59,16 @@ class RandomWordAugmenter:
 
 
 class MLMAugmenter(ABC):
-    def __init__(self, model_name_or_path=None, tokenizer=None, fraction: float = 0.12, min_mask: int = 1,
-                 max_mask: int = 100, topk: int = 5, uniform: bool = False, device=None):
+    def __init__(self, model_name_or_path=None, tokenizer=None, min_fraction: float = 0.04, max_fraction: float = 0.2,
+                 min_mask: int = 1, max_mask: int = 100, topk: int = 10, uniform: bool = False, device=None):
         """
         :param model: huggingface/transformers model for masked language modeling
             e.g model = RobertaForMaskedLM.from_pretrained('roberta-base', return_dict=True)
         :param tokenizer: huggingface/transformers tokenizer
             e.g tokenizer = RobertaTokenizer.from_pretrained('roberta-base')
-        :param fraction: fraction of words to insert
-        :param min_mask: minimum number of <mask> tokens to insert
+        :param min_fraction: minimum fraction of words to substitute/insert
+        :param max_fraction: maximum fraction of words to substitute/insert
+        :param min_mask: minimum number of tokens to mask
         :param max_mask: maximum number ot tokens to mask
         :param topk: number of top words to sample from
         :param uniform: whether to sample uniformly from topk words (defaults to False)
@@ -88,7 +89,9 @@ class MLMAugmenter(ABC):
         self.min_mask = min_mask
         self.max_mask = max_mask
         self.uniform = uniform
-        self.fraction = fraction
+        assert max_fraction >= min_fraction
+        self.min_fraction = min_fraction
+        self.max_fraction = max_fraction
 
     def sample_word(self, predicted_probas, black_word=None):
         if hasattr(predicted_probas, 'tolist'):
@@ -110,10 +113,12 @@ class MLMAugmenter(ABC):
 
 class MLMInsertionAugmenter(MLMAugmenter):
     def __call__(self, text: str):
-        if self.fraction == 0:
+        if self.max_fraction == 0:
             return text
         words = np.array(text.split(), dtype='object')
-        n_mask = max(self.min_mask, int(len(words) * self.fraction))
+        max_len = self.tokenizer.model_max_length
+        fraction = self.min_fraction + (self.max_fraction - self.min_fraction)*np.random.beta(2, 2)
+        n_mask = max(self.min_mask, int(min(max_len, len(words)) * fraction))
         n_mask = min(n_mask, self.max_mask)
         max_masked_idx = min(self.tokenizer.model_max_length // 2 - n_mask,
                              len(words) + 1)  # offset, since lenght might increase after tokenization
@@ -138,14 +143,16 @@ class MLMInsertionAugmenter(MLMAugmenter):
 
 class MLMSubstitutionAugmenter(MLMInsertionAugmenter):
     def __call__(self, text: str):
-        if self.fraction == 0:
+        if self.max_fraction == 0:
             return text
         try:
             words = np.array(text.split(), dtype='object')
-            n_mask = max(self.min_mask, int(len(words) * self.fraction))
+            max_len = self.tokenizer.model_max_length
+            fraction = self.min_fraction + (self.max_fraction - self.min_fraction) * np.random.beta(2, 2)
+            n_mask = max(self.min_mask, int(min(max_len, len(words)) * fraction))
             n_mask = min(n_mask, self.max_mask)
             # offset, since lenght might increase after tokenization
-            max_masked_idx = min(self.tokenizer.model_max_length // 2, len(words) + 1)
+            max_masked_idx = min(max_len // 2, len(words) + 1)
             vocab_word_indices = [i for i, word in itertools.islice(enumerate(words), max_masked_idx)
                                   if self.substitute_word(word)]
             if not vocab_word_indices:
@@ -165,7 +172,9 @@ class MLMSubstitutionAugmenter(MLMInsertionAugmenter):
             predicted_words = [self.sample_word(probas, black_word=word).strip() for probas, word in zip(predicted_probas, masked_words)]
             words[masked_indices] = predicted_words
             new_text = " ".join(words)
-        except:
+        except Exception as e:
+            print(f"Something went wrong during augmentation: {e}")
+            print("Text:", text)
             new_text = text
         return new_text
 

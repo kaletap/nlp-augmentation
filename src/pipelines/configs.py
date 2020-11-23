@@ -105,7 +105,7 @@ ag_news_config = {
     "eval_batch_size": 8,
     "gradient_accumulation_steps": 2,
     "metrics_function": compute_multiclass_metrics,
-    "train_sizes": [2500]
+    "train_sizes": [20, 100, 1000, 2_500]
 }
 
 imdb_config = {
@@ -121,7 +121,7 @@ imdb_config = {
     "eval_batch_size": 8,
     "gradient_accumulation_steps": 2,
     "metrics_function": compute_binary_metrics,
-    "train_sizes": [2500]
+    "train_sizes": [20, 100, 1000]
 }
 
 snli_config = {
@@ -137,7 +137,7 @@ snli_config = {
     "eval_batch_size": 8,
     "gradient_accumulation_steps": 1,
     "metrics_function": compute_multiclass_metrics,
-    "train_sizes": [2500]
+    "train_sizes": [20, 100, 1000, 2_500]
 }
 
 twitter_config = {
@@ -153,7 +153,7 @@ twitter_config = {
     "eval_batch_size": 16,
     "gradient_accumulation_steps": 1,
     "metrics_function": compute_binary_metrics,
-    "train_sizes": [2_500]
+    "train_sizes": [20, 100, 1000, 2_500]
 }
 
 yelp_config = {
@@ -169,7 +169,7 @@ yelp_config = {
     "eval_batch_size": 8,
     "gradient_accumulation_steps": 2,
     "metrics_function": compute_binary_metrics,
-    "train_sizes": [2_500]
+    "train_sizes": [20, 100, 1000]
 }
 
 dataset_configs = {
@@ -190,12 +190,10 @@ for config in dataset_configs.values():
 mlm_insertion_config = {
     "name": "mlm_insertion",
     "class": MLMInsertionAugmenter,
-    "use_finetuned": True,
+    "use_finetuned": False,
     "augmenter_parameters": {
-        "fraction": 0.12,
         "min_mask": 1,
         "max_mask": 100,
-        "topk": 10,
         "uniform": False
     },
     "augmentation_prob": 0.7,
@@ -204,12 +202,10 @@ mlm_insertion_config = {
 mlm_substitution_config = {
     "name": "mlm_substitution",
     "class": MLMSubstitutionAugmenter,
-    "use_finetuned": True,
+    "use_finetuned": False,
     "augmenter_parameters": {
-        "fraction": 0.12,
         "min_mask": 1,
         "max_mask": 100,
-        "topk": 10,
         "uniform": False
     },
     "augmentation_prob": 0.7,
