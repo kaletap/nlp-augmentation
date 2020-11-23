@@ -37,7 +37,7 @@ summary_bart_config = {
     "opt_func": optimizer.ranger,
     "loss_func": model_sum.HF_MaskedLMLoss,
     "metrics": (),
-    "bs": 8,
+    "bs": 4,
     "pre_config_overwrite": {'max_length': 130, 'min_length': 30},
     "train_params": {
         "all": {
