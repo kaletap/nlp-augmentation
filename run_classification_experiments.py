@@ -70,8 +70,8 @@ def run_exp():
             print(test_dataset[0])
 
             num_train_epochs = {
-                20: 15,
-                100: 15,
+                20: 10,
+                100: 10,
                 1000: 7,
                 2_500: 6,
                 10_000: 6,
