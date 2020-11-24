@@ -14,7 +14,7 @@ from transformers import (
 
 from src.data_processing import DataCollator
 from src.pipelines.configs import dataset_configs
-from src.pipelines.configs import bart_augmenter_config as augmentation_config
+from src.pipelines.configs import mlm_insertion_config as augmentation_config
 from src.pipelines.datasets import get_datasets
 
 
