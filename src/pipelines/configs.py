@@ -137,7 +137,7 @@ snli_config = {
     "eval_batch_size": 16,
     "gradient_accumulation_steps": 1,
     "metrics_function": compute_multiclass_metrics,
-    "train_sizes": [20, 100, 1000]
+    "train_sizes": [2500]
 }
 
 twitter_config = {
@@ -190,7 +190,7 @@ for config in dataset_configs.values():
 mlm_insertion_config = {
     "name": "mlm_insertion",
     "class": MLMInsertionAugmenter,
-    "use_finetuned": False,
+    "use_finetuned": True,
     "augmenter_parameters": {
         "min_mask": 1,
         "max_mask": 100,
@@ -202,7 +202,7 @@ mlm_insertion_config = {
 mlm_substitution_config = {
     "name": "mlm_substitution",
     "class": MLMSubstitutionAugmenter,
-    "use_finetuned": False,
+    "use_finetuned": True,
     "augmenter_parameters": {
         "min_mask": 1,
         "max_mask": 100,
