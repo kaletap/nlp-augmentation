@@ -45,6 +45,20 @@ class DatasetWithMultipleTexts(Dataset):
         return item
 
 
+class DatasetWithTokenization(Dataset):
+    def __init__(self, dataset, tokenizer):
+        self.dataset = dataset
+        self.tokenizer = tokenizer
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, i):
+        row = self.dataset[i]
+        row["tokenized_text"] = self.tokenizer(row["text"])
+        return row
+
+
 def get_datasets(dataset_name, augmenter=None, train_size=10_000, val_size=5_000, test_size=None, augmentation_prob=0.7,
                  random_seed: int = 42, load_test=False, filter_func=None, text_columns=None, sep_token=None):
     """
