@@ -190,7 +190,7 @@ for config in dataset_configs.values():
 mlm_insertion_config = {
     "name": "mlm_insertion",
     "class": MLMInsertionAugmenter,
-    "use_finetuned": True,
+    "use_finetuned": False,
     "augmenter_parameters": {
         "min_mask": 1,
         "max_mask": 100,
@@ -202,7 +202,31 @@ mlm_insertion_config = {
 mlm_substitution_config = {
     "name": "mlm_substitution",
     "class": MLMSubstitutionAugmenter,
+    "use_finetuned": False,
+    "augmenter_parameters": {
+        "min_mask": 1,
+        "max_mask": 100,
+        "uniform": False
+    },
+    "augmentation_prob": 0.7,
+}
+
+finetuned_mlm_insertion_config = {
+    "name": "mlm_insertion",
+    "class": MLMInsertionAugmenter,
     "use_finetuned": True,
+    "augmenter_parameters": {
+        "min_mask": 1,
+        "max_mask": 100,
+        "uniform": False
+    },
+    "augmentation_prob": 0.7,
+}
+
+finetuned_mlm_substitution_config = {
+    "name": "mlm_substitution",
+    "class": MLMSubstitutionAugmenter,
+    "use_finetuned": False,
     "augmenter_parameters": {
         "min_mask": 1,
         "max_mask": 100,
@@ -240,4 +264,15 @@ no_augmenter_config = {
     "class": NoAugmenter,
     "augmenter_parameters": dict(),
     "augmentation_prob": 0.0,
+}
+
+# Classification model config
+
+augmentation_configs = [no_augmenter_config, swap_config, mlm_insertion_config, mlm_substitution_config,
+                        finetuned_mlm_insertion_config, finetuned_mlm_substitution_config]
+
+cnn_classifier_config = {
+    "embedding_size": 128,
+    "out_size": 256,
+    "stride": 2
 }

@@ -1,5 +1,5 @@
 """
-Simple training loop; Taken from https://github.com/karpathy/minGPT/blob/master/mingpt/trainer.py
+Simple training loop; Based on https://github.com/karpathy/minGPT/blob/master/mingpt/trainer.py
 """
 
 import math
@@ -12,6 +12,12 @@ import torch
 from torch.utils.data.dataloader import DataLoader
 
 logger = logging.getLogger(__name__)
+
+
+class Prediction:
+    def __init__(self, label_ids, predictions):
+        self.label_ids = label_ids
+        self.predictions = predictions
 
 
 class TrainerConfig:
@@ -38,12 +44,13 @@ class TrainerConfig:
 
 class Trainer:
 
-    def __init__(self, model, train_dataset, test_dataset, collator, config):
+    def __init__(self, model, train_dataset, test_dataset, collator, config, compute_metrics):
         self.model = model
         self.train_dataset = train_dataset
         self.test_dataset = test_dataset
         self.collator = collator
         self.config = config
+        self.compute_metrics = compute_metrics
 
         # take over whatever gpus are on the system
         self.device = 'cpu'
@@ -133,3 +140,21 @@ class Trainer:
             if self.config.ckpt_path is not None and good_model:
                 best_loss = valid_loss
                 self.save_checkpoint()
+
+    def evaluate(self, data):
+        model, config = self.model.eval(), self.config
+        loader = DataLoader(data, shuffle=True, pin_memory=True,
+                            batch_size=config.batch_size,
+                            num_workers=config.num_workers,
+                            collate_fn=self.collator)
+        outputs = list()
+        labels_list = list()
+        with torch.no_grad():
+            for x, y in loader:
+                out, _ = model(x)
+                outputs.append(out)
+                labels_list.append(y)
+        predictions = torch.cat(outputs)
+        label_ids = torch.cat(labels_list)
+        pred = Prediction(label_ids, predictions)
+        return self.compute_metrics(pred)

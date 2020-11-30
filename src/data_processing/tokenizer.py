@@ -32,11 +32,12 @@ class Tokenizer:
         return cls(vocab_list, max_length)
 
     @classmethod
-    def get_vocabulary(cls, sentences: List[List[str]], num_words: int) -> List[str]:
-        # Builds the vocabulary and keeps the "num_words" most frequent words
+    def get_vocabulary(cls, sentences: List[List[str]], num_words: int, min_occ: int = 2) -> List[str]:
+        # Builds the vocabulary and keeps the "num_words" most frequent words that appeared at least min_occ times
         counter = Counter()
         for sentence in sentences:
             counter.update(sentence)
+        counter = {word: count for word, count in counter.items() if count > min_occ}
         common_words = heapq.nlargest(num_words, counter, key=counter.get)
         return common_words
 
