@@ -5,6 +5,8 @@ import warnings
 from collections import defaultdict
 from datetime import datetime
 
+import torch
+
 from src.data_processing import TokenizedDataCollator, Tokenizer
 from src.model import CnnClassifier, CnnClassifierConfig
 from src.pipelines.configs import augmentation_configs, cnn_classifier_config, dataset_configs
@@ -21,6 +23,8 @@ MLM_ROOT_PATH = "/kaggle/input/"  # "/content/drive/MyDrive/Colab Notebooks/nlp/
 def run_exp():
     accuracies = defaultdict(list)
     for name, config in dataset_configs.items():
+        if not config["train_sizes"]:
+            continue
         for augmentation_config in augmentation_configs:
             print("Dataset:", name, "config:", config)
             print("Augmentation config:", augmentation_config)
@@ -80,6 +84,8 @@ def run_exp():
 
                 trainer.train()
 
+                # Loading the best model
+                model.load_state_dict(torch.load(output_dir))
                 test_result = trainer.evaluate(test_dataset)
                 accuracies[name].append(test_result['accuracy'])
                 # TODO: save csv instead of json
