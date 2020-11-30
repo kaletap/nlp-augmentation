@@ -79,7 +79,7 @@ def run_exp():
                     test_dataset=val_dataset,
                     collator=data_collator,
                     config=trainer_config,
-                    compute_metrics=trainer_config["metrics_function"]
+                    compute_metrics=config["metrics_function"]
                 )
 
                 trainer.train()
