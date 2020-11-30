@@ -5,18 +5,11 @@ import warnings
 from collections import defaultdict
 from datetime import datetime
 
-import torch
-from datasets import load_dataset
-
 from src.data_processing import TokenizedDataCollator, Tokenizer
 from src.model import CnnClassifier, CnnClassifierConfig
-from src.pipelines.datasets import DatasetWithTokenization
+from src.pipelines.configs import augmentation_configs, cnn_classifier_config, dataset_configs
+from src.pipelines.datasets import get_datasets,  DatasetWithTokenization
 from src.training_utils import Trainer, TrainerConfig
-
-
-from src.pipelines.configs import cnn_classifier_config, dataset_configs
-from src.pipelines.configs import augmentation_configs
-from src.pipelines.datasets import get_datasets
 
 
 # Setup
@@ -62,7 +55,6 @@ def run_exp():
                 test_dataset = DatasetWithTokenization(test_dataset, tokenizer)
 
                 data_collator = TokenizedDataCollator(tokenizer,
-                                                      text_colname="text_colname",
                                                       label_colname=config["label_colname"],
                                                       pad_token_id=tokenizer.pad_token_id)
                 model_config = CnnClassifierConfig(num_labels=config["num_labels"], seq_len=tokenizer.max_length,
