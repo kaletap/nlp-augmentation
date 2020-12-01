@@ -24,7 +24,7 @@ class DataCollator:
 
 
 class TokenizedDataCollator:
-    def __init__(self, text_colname="tokenized_text", label_colname="label", pad_token_id=0, padding=None, max_length=512):
+    def __init__(self, *, text_colname="tokenized_text", label_colname="label", pad_token_id=0, padding=None, max_length=512):
         self.text_colname = text_colname
         self.label_colname = label_colname
         self.pad_token_id = pad_token_id
