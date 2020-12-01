@@ -87,7 +87,7 @@ def run_exp():
                 # Loading the best model
                 model.load_state_dict(torch.load(output_dir))
                 test_result = trainer.evaluate(test_dataset)
-                results_df.append({
+                results_df = results_df.append({
                     "dataset": name,
                     "augmentation": augmentation_config["name"],
                     "training_size": train_size,
