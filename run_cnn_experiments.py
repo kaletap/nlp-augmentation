@@ -5,6 +5,7 @@ import warnings
 from collections import defaultdict
 from datetime import datetime
 
+import pandas as pd
 import torch
 
 from src.data_processing import TokenizedDataCollator, Tokenizer
@@ -21,7 +22,7 @@ MLM_ROOT_PATH = "/kaggle/input/"  # "/content/drive/MyDrive/Colab Notebooks/nlp/
 
 
 def run_exp():
-    accuracies = defaultdict(list)
+    results_df = pd.DataFrame(columns=["dataset", "augmentation", "training_size", "vocab_words", "seq_len", "accuracy"])
     for name, config in dataset_configs.items():
         if not config["train_sizes"]:
             continue
@@ -52,7 +53,7 @@ def run_exp():
                     sep_token=Tokenizer.sep_token
                 )
 
-                tokenizer = Tokenizer.from_dataset(train_dataset, num_words=10_000)
+                tokenizer = Tokenizer.from_dataset(train_dataset, num_words=10_000)  # creating tokenizer on augmented samples
                 print(f"Created tokenizer with {len(tokenizer)} vocab words. Using sequence length of {tokenizer.max_length}")
                 train_dataset = DatasetWithTokenization(train_dataset, tokenizer)  # augmentation is on pure dataset
                 val_dataset = DatasetWithTokenization(val_dataset, tokenizer)
@@ -86,14 +87,19 @@ def run_exp():
                 # Loading the best model
                 model.load_state_dict(torch.load(output_dir))
                 test_result = trainer.evaluate(test_dataset)
-                accuracies[name].append(test_result['accuracy'])
-                # TODO: save csv instead of json
+                results_df.append({
+                    "dataset": name,
+                    "augmentation": augmentation_config["name"],
+                    "training_size": train_size,
+                    "vocab_words": len(tokenizer),
+                    "seq_len": tokenizer.max_length,
+                    "accuracy": test_result["accuracy"]
+                })
                 with open(os.path.join(SAVE_DIR, f'{name}_{augmentation_config["name"]}_train_size_{train_size}.json'), 'w') as f:
                     json.dump(test_result, f, indent=4)
                 print(test_result)
-                with open(os.path.join(SAVE_DIR, 'accuracies.json'), 'w') as f:
-                    json.dump(accuracies, f, indent=4)
-                print(accuracies)
+                results_df.to_csv(os.path.join(SAVE_DIR, 'results.csv'))
+                print(results_df)
                 shutil.rmtree(output_dir, ignore_errors=True)
                 print()
 

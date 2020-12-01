@@ -123,7 +123,7 @@ mlm_substitution_config = {
 }
 
 finetuned_mlm_insertion_config = {
-    "name": "mlm_insertion",
+    "name": "finetuned_mlm_insertion",
     "class": MLMInsertionAugmenter,
     "use_finetuned": True,
     "augmenter_parameters": {
@@ -135,9 +135,9 @@ finetuned_mlm_insertion_config = {
 }
 
 finetuned_mlm_substitution_config = {
-    "name": "mlm_substitution",
+    "name": "finetuend_mlm_substitution",
     "class": MLMSubstitutionAugmenter,
-    "use_finetuned": False,
+    "use_finetuned": True,
     "augmenter_parameters": {
         "min_mask": 1,
         "max_mask": 100,
