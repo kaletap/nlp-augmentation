@@ -17,7 +17,8 @@ class Tokenizer:
     def __init__(self, vocab_list: List[str], max_length: int = None):
         # add special tokens to the vocabulary
         for special_token in self.special_tokens:
-            vocab_list.insert(0, special_token)
+            if special_token not in vocab_list:
+                vocab_list.insert(0, special_token)
         self.word2idx = {word: idx for idx, word in enumerate(vocab_list)}
         self.idx2word = vocab_list
         # max_length used later for CNN classifier (a quantile of tokenized length distribution)

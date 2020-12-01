@@ -9,7 +9,7 @@ import torch
 
 from src.data_processing import TokenizedDataCollator, Tokenizer
 from src.model import CnnClassifier, CnnClassifierConfig
-from src.pipelines.configs import augmentation_configs, cnn_classifier_config, dataset_configs
+from src.pipelines.classification_configs import augmentation_configs, cnn_classifier_config, dataset_configs
 from src.pipelines.datasets import get_datasets,  DatasetWithTokenization
 from src.training_utils import Trainer, TrainerConfig
 
