@@ -191,7 +191,6 @@ cnn_classifier_config = {
 # Classification trainer config
 
 trainer_config_dict = {
-    "max_epochs": 10,
     "batch_size": 64,
     "cuda": True
 }

@@ -71,8 +71,10 @@ def run_exp():
                 print(val_dataset[0])
                 print(test_dataset[0])
 
+                num_train_epochs = {20: 15, 100: 20}.get(train_size, 10)
+
                 output_dir = os.path.join(ROOT_OUTPUT_DIR, "cnn_model.pt")
-                trainer_config = TrainerConfig(ckpt_path=output_dir, **trainer_config_dict)
+                trainer_config = TrainerConfig(ckpt_path=output_dir, max_epochs=num_train_epochs, **trainer_config_dict)
                 trainer = Trainer(
                     model=model,
                     train_dataset=train_dataset,
