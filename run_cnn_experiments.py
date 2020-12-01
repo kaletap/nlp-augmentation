@@ -94,7 +94,7 @@ def run_exp():
                     "vocab_words": len(tokenizer),
                     "seq_len": tokenizer.max_length,
                     "accuracy": test_result["accuracy"]
-                })
+                }, ignore_index=True)
                 with open(os.path.join(SAVE_DIR, f'{name}_{augmentation_config["name"]}_train_size_{train_size}.json'), 'w') as f:
                     json.dump(test_result, f, indent=4)
                 print(test_result)
