@@ -27,7 +27,7 @@ class TrainerConfig:
     learning_rate = 0.001
     betas = (0.9, 0.95)
     grad_norm_clip = 1.0
-    weight_decay = 0.01  # only applied on matmul weights
+    weight_decay = 0.01
     # learning rate decay params: linear warmup followed by cosine decay to 10% of original
     lr_decay = False
     warmup_tokens = 375e6  # these two numbers come from the GPT-3 paper, but may not be good defaults elsewhere
@@ -151,7 +151,7 @@ class Trainer:
         labels_list = list()
         with torch.no_grad():
             for x, y in loader:
-                out, _ = model(x)
+                out, _ = model(x, y)
                 outputs.append(out)
                 labels_list.append(y)
         predictions = torch.cat(outputs)
