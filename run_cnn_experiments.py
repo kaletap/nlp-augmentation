@@ -58,7 +58,8 @@ def run_exp():
                 val_dataset = DatasetWithTokenization(val_dataset, tokenizer)
                 test_dataset = DatasetWithTokenization(test_dataset, tokenizer)
 
-                data_collator = TokenizedDataCollator(label_colname=config["label_colname"], pad_token_id=tokenizer.pad_token_id)
+                data_collator = TokenizedDataCollator(label_colname=config["label_colname"],
+                                                      pad_token_id=tokenizer.pad_token_id, padding=tokenizer.max_length)
                 model_config = CnnClassifierConfig(num_labels=config["num_labels"], seq_len=tokenizer.max_length,
                                                    num_words=len(tokenizer), **cnn_classifier_config)
                 model = CnnClassifier(model_config)
