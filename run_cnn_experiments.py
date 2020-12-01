@@ -9,7 +9,7 @@ import torch
 
 from src.data_processing import TokenizedDataCollator, Tokenizer
 from src.model import CnnClassifier, CnnClassifierConfig
-from src.pipelines.classification_configs import augmentation_configs, cnn_classifier_config, dataset_configs
+from src.pipelines.classification_configs import augmentation_configs, cnn_classifier_config, dataset_configs, trainer_config_dict
 from src.pipelines.datasets import get_datasets,  DatasetWithTokenization
 from src.training_utils import Trainer, TrainerConfig
 
@@ -71,7 +71,7 @@ def run_exp():
                 print(test_dataset[0])
 
                 output_dir = os.path.join(ROOT_OUTPUT_DIR, "cnn_model.pt")
-                trainer_config = TrainerConfig(max_epochs=10, batch_size=64, cuda=False, ckpt_path="cnn_model.pt")
+                trainer_config = TrainerConfig(ckpt_path=output_dir, **trainer_config_dict)
                 trainer = Trainer(
                     model=model,
                     train_dataset=train_dataset,
