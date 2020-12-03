@@ -22,6 +22,7 @@ def augment_data(df, task, aug_type, aug_repeat, x_cols):
 def augment_qa(df, idx, row, col, aug_fn):
     assert len(row["answers"]["answer_start"]) == 1, "There is more than one answer to one" \
                                                      "context. It's not supported by this preprocessing"
+
     answer = row["answers"]
     answer_start, answer_txt = answer["answer_start"][0], answer["text"][0]
     answer_end = answer_start + len(answer_txt)
@@ -32,10 +33,10 @@ def augment_qa(df, idx, row, col, aug_fn):
     aug_context_first_part = aug_fn(context_first_part) + " "
     aug_context_second_part = " " + aug_fn(context_second_part)
 
-    answer_start = len(aug_context_first_part)
     auged_txt = aug_context_first_part + answer_txt + aug_context_second_part
 
-    answer["answer_start"][0] = answer_start
+    answer["answer_start"][0] = 420
+    answer["answer_end"][0] = 420
     df.loc[idx, col] = auged_txt
     return df
 
