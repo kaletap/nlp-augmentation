@@ -48,9 +48,9 @@ summary_bart_config = {
     }
 }
 
-qa_albert_config = {
-    "pretrained_model_name": "albert-base-v2",
-    "model_class": transformers.AlbertForQuestionAnswering,
+qa_xlm_config = {
+    "pretrained_model_name": "xlm-mlm-ende-1024",
+    "model_class": transformers.XLMForQuestionAnswering,
     "task": "qa",
     "opt_func": partial(optimizer.Adam, decouple_wd=True),
     "loss_func": model_qa.MultiTargetLoss,
@@ -122,6 +122,6 @@ experiments_setup = {
     "seeds": (21, 37),# 9, 11, 21, 37]
     "tasks": {
         "summarization": ((pipeline.SummarizationPipeline, {**summary_bart_config, **cnn_dailymail_config, **common_config})),
-        "qa": ((pipeline.QuestionAnsweringPipeline, {**qa_albert_config, **squad_v2_config, **common_config}))
+        "qa": ((pipeline.QuestionAnsweringPipeline, {**qa_distilbert_config, **squad_v2_config, **common_config}))
     },
 }
