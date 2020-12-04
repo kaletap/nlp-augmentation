@@ -35,8 +35,6 @@ def augment_qa(df, idx, row, col, aug_fn):
 
     auged_txt = aug_context_first_part + answer_txt + aug_context_second_part
 
-    answer["answer_start"][0] = 420
-    answer["answer_end"][0] = 420
     df.loc[idx, col] = auged_txt
     return df
 
