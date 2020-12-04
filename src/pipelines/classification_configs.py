@@ -84,11 +84,11 @@ yelp_config = {
 }
 
 dataset_configs = {
-    "ag_news": ag_news_config,
-    "imdb": imdb_config,
+    # "ag_news": ag_news_config,
+    # "imdb": imdb_config,
     "snli": snli_config,
     "twitter": twitter_config,
-    "yelp": yelp_config
+    # "yelp": yelp_config
 }
 
 keys = ag_news_config.keys()
