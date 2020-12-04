@@ -48,6 +48,42 @@ summary_bart_config = {
     }
 }
 
+qa_xlm_config = {
+    "pretrained_model_name": "xlm-mlm-ende-1024",
+    "model_class": transformers.XLMForQuestionAnswering,
+    "task": "qa",
+    "opt_func": partial(optimizer.Adam, decouple_wd=True),
+    "loss_func": model_qa.MultiTargetLoss,
+    "metrics": (),
+    "bs": 8,
+    "pre_config_overwrite": {},
+    "train_params": {
+        "all": {
+            "epochs": (10,),
+            "unfreeze": (),
+            "lr": (),
+        },
+    }
+}
+
+qa_distilbert_config = {
+    "pretrained_model_name": "distilbert-base-uncased",
+    "model_class": transformers.DistilBertForQuestionAnswering,
+    "task": "qa",
+    "opt_func": partial(optimizer.Adam, decouple_wd=True),
+    "loss_func": model_qa.MultiTargetLoss,
+    "metrics": (),
+    "bs": 8,
+    "pre_config_overwrite": {},
+    "train_params": {
+        "all": {
+            "epochs": (10,),
+            "unfreeze": (),
+            "lr": (),
+        },
+    }
+}
+
 qa_bert_config = {
     "pretrained_model_name": "bert-large-uncased-whole-word-masking-finetuned-squad",
     "model_class": transformers.BertForQuestionAnswering,
@@ -83,9 +119,9 @@ common_config = {
 experiments_setup = {
     "train_samples": ((100, 100), (1000, 10), (5000, 2)), #["all", 10, 100, 1000, 10000], # (org_smpl_count, aug_repeat)
     "augmentations": ("rules", "no_aug", "LM"),# "vae", "rules", "style_transfer"],
-    "seeds": (9, ),# 9, 11, 21, 37]
+    "seeds": (21, 37),# 9, 11, 21, 37]
     "tasks": {
         "summarization": ((pipeline.SummarizationPipeline, {**summary_bart_config, **cnn_dailymail_config, **common_config})),
-        "qa": ((pipeline.QuestionAnsweringPipeline, {**qa_bert_config, **squad_v2_config, **common_config}))
+        "qa": ((pipeline.QuestionAnsweringPipeline, {**qa_xlm_config, **squad_v2_config, **common_config}))
     },
 }
