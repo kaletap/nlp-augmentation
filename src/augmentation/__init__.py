@@ -5,3 +5,4 @@ from .augmentations import (
     NoAugmenter,
     RandomWordAugmenter
 )
+from .augment_dataset import augment_dataset
