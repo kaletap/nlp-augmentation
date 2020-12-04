@@ -60,7 +60,8 @@ class DatasetWithTokenization(Dataset):
 
 
 def get_datasets(dataset_name, augmenter=None, train_size=10_000, val_size=5_000, test_size=None, augmentation_prob=0.7,
-                 random_seed: int = 42, load_test=False, filter_func=None, text_columns=None, sep_token=None):
+                 random_seed: int = 42, load_test=False, filter_func=None, text_columns=None, merge_text_columns=True,
+                 sep_token=None):
     """
     Returns a tuple of train, validation and test datasets of sizes determined by arguments.
     If load_test is False, test_size has to be specified.
@@ -86,7 +87,7 @@ def get_datasets(dataset_name, augmenter=None, train_size=10_000, val_size=5_000
     # we only want to use train_size samples for training
     train_dataset = train_val_split["train"].train_test_split(train_size=train_size, seed=random_seed)["train"]
     val_dataset = train_val_split["test"]
-    if text_columns and type(text_columns) == list:
+    if text_columns and type(text_columns) == list and merge_text_columns:
         assert sep_token is not None, "Sep token has to be specified when using multiple text columns"
         train_dataset = DatasetWithMultipleTexts(train_dataset, text_columns, sep_token)
         val_dataset = DatasetWithMultipleTexts(val_dataset, text_columns, sep_token)

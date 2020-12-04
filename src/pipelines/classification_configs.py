@@ -80,7 +80,7 @@ yelp_config = {
     "eval_batch_size": 8,
     "gradient_accumulation_steps": 2,
     "metrics_function": compute_binary_metrics,
-    "train_sizes": [20, 100, 1000]
+    "train_sizes": [20, 100, 1000, 2500]
 }
 
 dataset_configs = {
