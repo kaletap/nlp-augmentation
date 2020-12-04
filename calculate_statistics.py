@@ -21,12 +21,12 @@ args = parser.parse_args()
 experiments_setup = {
     "ds_name": ("squad_v2",),
     "task": {"qa": ("valid_loss", "exact_match", "f1"), "summarization": ("valid_loss", "rouge_1", "rouge_2", "rouge_L")},
-    "train_samples": ((100, 1), (1000, 1), (5000, 1)),
+    "train_samples": ((100, 100), (1000, 10), (5000, 2)),
     "augmentations": ("rules", "no_aug", "LM"),
-    "seeds": (9, 11, 21, 37),
+    "seeds": (9, 21, 37),
     "pretrained_model_name": "bert-large-uncased-whole-word-masking-finetuned-squad",
     "metrics_save_paths":
-        "metrics_{task}_ds-{dataset}_model-{model}_train_size-{train_samples}_aug-{aug}_seed-{seed}.csv",
+        "metrics_{task}_ds-{dataset}_model-{model}_train_size-{train_samples}_aug-{aug}_repeat-{repeat}_seed-{seed}.csv",
 }
 
 
