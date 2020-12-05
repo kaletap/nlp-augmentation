@@ -122,6 +122,6 @@ experiments_setup = {
     "seeds": (9, ),# 9, 11, 21, 37]
     "tasks": {
         "summarization": ((pipeline.SummarizationPipeline, {**summary_bart_config, **cnn_dailymail_config, **common_config})),
-        "qa": ((pipeline.QuestionAnsweringPipeline, {**qa_xlm_config, **squad_v2_config, **common_config}))
+        "qa": ((pipeline.QuestionAnsweringPipeline, {**qa_bert_config, **squad_v2_config, **common_config}))
     },
 }
