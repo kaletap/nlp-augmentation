@@ -41,7 +41,7 @@ summary_bart_config = {
     "pre_config_overwrite": {'max_length': 130, 'min_length': 30},
     "train_params": {
         "all": {
-            "epochs": (3,),
+            "epochs": (1,),
             "unfreeze": (),
             "lr": (),
         },
@@ -95,7 +95,7 @@ qa_bert_config = {
     "pre_config_overwrite": {},
     "train_params": {
         "all": {
-            "epochs": (10,),
+            "epochs": (5,),
             "unfreeze": (),
             "lr": (),
         },
@@ -117,11 +117,11 @@ common_config = {
 }
 
 experiments_setup = {
-    "train_samples": ((100, 100), (1000, 10), (5000, 2)), #["all", 10, 100, 1000, 10000], # (org_smpl_count, aug_repeat)
-    "augmentations": ("rules", "no_aug", "LM"),# "vae", "rules", "style_transfer"],
-    "seeds": (21, 37),# 9, 11, 21, 37]
+    "train_samples": ((5000, 100), (5000, 1000), (5000, 2500), (5000, 5000), (5000, 7500), (5000, 10000), (5000, 25000), (5000, 50000)), #["all", 10, 100, 1000, 10000], # (org_smpl_count, aug_repeat)
+    "augmentations": ("rules", "LM"),# "vae", "rules", "style_transfer"],
+    "seeds": (9, ),# 9, 11, 21, 37]
     "tasks": {
         "summarization": ((pipeline.SummarizationPipeline, {**summary_bart_config, **cnn_dailymail_config, **common_config})),
-        "qa": ((pipeline.QuestionAnsweringPipeline, {**qa_xlm_config, **squad_v2_config, **common_config}))
+        "qa": ((pipeline.QuestionAnsweringPipeline, {**qa_bert_config, **squad_v2_config, **common_config}))
     },
 }

@@ -30,7 +30,7 @@ def fixed_pre_process_squad(row, hf_tokenizer):
         tok_input = hf_tokenizer.convert_ids_to_tokens(hf_tokenizer.encode(context, qst, **tok_kwargs))
 
     start_idx, end_idx = 0, 0
-    if not (ans['answer_start'] == 0 and ans['answer_end'] == 0):
+    if not (ans['answer_start'] == 0 and len(ans['text']) == 0):
         tok_ans = hf_tokenizer.tokenize(str(row['answers']["text"][0]), **tok_kwargs)
         for idx, tok in enumerate(tok_input):
             try:
