@@ -41,7 +41,7 @@ summary_bart_config = {
     "pre_config_overwrite": {'max_length': 130, 'min_length': 30},
     "train_params": {
         "all": {
-            "epochs": (3,),
+            "epochs": (1,),
             "unfreeze": (),
             "lr": (),
         },
@@ -95,7 +95,7 @@ qa_bert_config = {
     "pre_config_overwrite": {},
     "train_params": {
         "all": {
-            "epochs": (3,),
+            "epochs": (5,),
             "unfreeze": (),
             "lr": (),
         },
