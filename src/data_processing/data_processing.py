@@ -21,6 +21,8 @@ def squad_v2_preprocessing(df, tokenizer, max_len):
 def fixed_pre_process_squad(row, hf_tokenizer):
     context, qst, ans = row['context'], row['question'], row['answers']
 
+    import pdb;pdb.set_trace()
+
     tok_kwargs = {}
     if (hasattr(hf_tokenizer, 'add_prefix_space')): tok_kwargs['add_prefix_space'] = True
 
