@@ -16,7 +16,11 @@ def augment_dataset(dataset, augmenter, n_times, text_columns):
         for _ in range(1, n_times + 1):
             new_row = row.copy()
             for column in text_columns:  # usually no more than two columns
-                new_row[column] = augmenter(new_row[column])
+                try:
+                    new_row[column] = augmenter(new_row[column])
+                except Exception as e:
+                    print(f"Something went wrong when augmenting item number {idx}: {e}")
+                    print(new_row)
             new_row["augmented"] = True
             new_row["idx"] = idx
             augmented_rows.append(new_row)

@@ -1,5 +1,6 @@
 import random
 
+import pandas as pd
 from datasets import load_dataset
 from torch.utils.data import Dataset
 
@@ -59,9 +60,21 @@ class DatasetWithTokenization(Dataset):
         return row
 
 
+class DatasetFromCsv(Dataset):
+    def __init__(self, filepath):
+        self.dataset_df = pd.read_csv(filepath)
+
+    def __len__(self):
+        return len(self.dataset_df)
+
+    def __getitem__(self, i):
+        row = self.dataset_df.iloc[i]
+        return {column: row[column] for column in self.dataset_df.columns}
+
+
 def get_datasets(dataset_name, augmenter=None, train_size=10_000, val_size=5_000, test_size=None, augmentation_prob=0.7,
                  random_seed: int = 42, load_test=False, filter_func=None, text_columns=None, merge_text_columns=True,
-                 sep_token=None):
+                 sep_token=None, training_csv_path=None):
     """
     Returns a tuple of train, validation and test datasets of sizes determined by arguments.
     If load_test is False, test_size has to be specified.
@@ -85,7 +98,10 @@ def get_datasets(dataset_name, augmenter=None, train_size=10_000, val_size=5_000
         test_dataset = test_dataset.filter(filter_func)
     train_val_split = dataset.train_test_split(test_size=val_size, seed=random_seed)
     # we only want to use train_size samples for training
-    train_dataset = train_val_split["train"].train_test_split(train_size=train_size, seed=random_seed)["train"]
+    if training_csv_path:
+        train_dataset = DatasetFromCsv(training_csv_path)
+    else:
+        train_dataset = train_val_split["train"].train_test_split(train_size=train_size, seed=random_seed)["train"]
     val_dataset = train_val_split["test"]
     if text_columns and type(text_columns) == list and merge_text_columns:
         assert sep_token is not None, "Sep token has to be specified when using multiple text columns"

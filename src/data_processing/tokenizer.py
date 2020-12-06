@@ -25,15 +25,15 @@ class Tokenizer:
         self.max_length = max_length
 
     @classmethod
-    def from_dataset(cls, dataset, text_column="text", num_words: int = 10_000):
+    def from_dataset(cls, dataset, text_column="text", num_words: int = 10_000, min_occ: int = 1):
         texts = [row[text_column] for row in dataset]
         tokenized_texts = [cls.tokenize(text) for text in tqdm(texts, desc="tokenization of dataset sentences")]
-        vocab_list = cls.get_vocabulary(tokenized_texts, num_words)
+        vocab_list = cls.get_vocabulary(tokenized_texts, num_words, min_occ)
         max_length = cls.get_max_length(tokenized_texts)
         return cls(vocab_list, max_length)
 
     @classmethod
-    def get_vocabulary(cls, sentences: List[List[str]], num_words: int, min_occ: int = 2) -> List[str]:
+    def get_vocabulary(cls, sentences: List[List[str]], num_words: int, min_occ: int) -> List[str]:
         # Builds the vocabulary and keeps the "num_words" most frequent words that appeared at least min_occ times
         counter = Counter()
         for sentence in sentences:
