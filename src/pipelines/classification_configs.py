@@ -16,7 +16,13 @@ ag_news_config = {
     "eval_batch_size": 8,
     "gradient_accumulation_steps": 2,
     "metrics_function": compute_multiclass_metrics,
-    "train_sizes": [20, 100, 1000, 2_500]
+    "train_sizes": [20, 100, 1000, 2_500],
+    "label_map": {
+        0: "World",
+        1: "Sports",
+        2: "Business",
+        3: "Sci/Tech"
+    }
 }
 
 imdb_config = {
@@ -32,7 +38,11 @@ imdb_config = {
     "eval_batch_size": 8,
     "gradient_accumulation_steps": 2,
     "metrics_function": compute_binary_metrics,
-    "train_sizes": [20, 100, 1000]
+    "train_sizes": [20, 100, 1000],
+    "label_map": {
+        0: "negative",
+        1: "positive"
+    }
 }
 
 snli_config = {
@@ -48,7 +58,12 @@ snli_config = {
     "eval_batch_size": 16,
     "gradient_accumulation_steps": 1,
     "metrics_function": compute_multiclass_metrics,
-    "train_sizes": [20, 100, 1000, 2_500]
+    "train_sizes": [20, 100, 1000, 2_500],
+    "label_map": {
+        0: "entailment",
+        1: "neutral",
+        2: "contradiction"
+    }
 }
 
 twitter_config = {
@@ -64,7 +79,11 @@ twitter_config = {
     "eval_batch_size": 16,
     "gradient_accumulation_steps": 1,
     "metrics_function": compute_binary_metrics,
-    "train_sizes": [20, 100, 1000, 2_500]
+    "train_sizes": [20, 100, 1000, 2_500],
+    "label_map": {
+        0: "negative",
+        1: "positive"
+    }
 }
 
 yelp_config = {
@@ -80,7 +99,11 @@ yelp_config = {
     "eval_batch_size": 8,
     "gradient_accumulation_steps": 2,
     "metrics_function": compute_binary_metrics,
-    "train_sizes": [20, 100, 1000, 2500]
+    "train_sizes": [20, 100, 1000, 2500],
+    "label_map": {
+        0: "negative",
+        1: "positive"
+    }
 }
 
 dataset_configs = {
