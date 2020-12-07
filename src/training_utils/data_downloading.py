@@ -1,3 +1,4 @@
+import ast
 import pandas as pd
 from tqdm import tqdm
 
@@ -10,6 +11,7 @@ def get_augmentation_fn(augmenter, x_cols):
 
 def augment_data(df, task, aug_type, aug_repeat, x_cols):
     if aug_type != "no_aug":
+        import pdb;pdb.set_trace()
         augmenter = augmentations.get_augmentation_fn(aug_type, wrapped=False)
         aug_df = pd.concat([df] * (aug_repeat - 1)).reset_index(drop=True)
         augment_text_df(aug_df, task, x_cols, augmenter)
@@ -20,8 +22,6 @@ def augment_data(df, task, aug_type, aug_repeat, x_cols):
 
 
 def augment_qa(df, idx, row, col, aug_fn):
-
-    row["answers"] = eval(row["answers"])
     assert len(row["answers"]["answer_start"]) == 1, "There is more than one answer to one" \
                                                      "context. It's not supported by this preprocessing"
 
@@ -51,6 +51,7 @@ def augment_text_df(df, task, x_cols, aug_fn):
     for idx, row in tqdm(df.iterrows()):
         for col in x_cols:
             if task == "qa":
+                df['answers'] = df['answers'].map(ast.literal_eval)
                 df = augment_qa(df, idx, row, col, aug_fn)
             elif task == "summarization":
                 df = augment_summ(df, idx, row, col, aug_fn)
