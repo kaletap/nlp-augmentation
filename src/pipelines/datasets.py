@@ -77,6 +77,8 @@ class ConditionalDataset(Dataset):
         self.dataset = dataset
         self.config = config
         self.sep_token = sep_token
+        if hasattr(dataset, "column_names"):
+            self.column_names = dataset.column_names
 
     def __len__(self):
         return len(self.dataset)
