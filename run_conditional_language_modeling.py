@@ -94,6 +94,12 @@ class DataTrainingArguments:
     dataset_name: Optional[str] = field(
         default=None, metadata={"help": "The name of the dataset to use (from dataset_configs)."}
     )
+    train_size: int = field(
+        default=1000,
+        metadata={
+            "help": "Size of training dataset."
+        },
+    )
     overwrite_cache: bool = field(
         default=False, metadata={"help": "Overwrite the cached training and evaluation sets"}
     )
