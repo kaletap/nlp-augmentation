@@ -21,7 +21,7 @@ def augment_data(df, task, aug_type, aug_repeat, x_cols):
 
 
 def augment_qa(df, idx, row, col, aug_fn):
-    import pdb;pdb.set_trace()
+    row["answers"] = eval(row["answers"])
     assert len(row["answers"]["answer_start"]) == 1, "There is more than one answer to one" \
                                                      "context. It's not supported by this preprocessing"
 
@@ -51,7 +51,6 @@ def augment_text_df(df, task, x_cols, aug_fn):
     for idx, row in tqdm(df.iterrows()):
         for col in x_cols:
             if task == "qa":
-                df['answers'] = df['answers'].map(ast.literal_eval)
                 df = augment_qa(df, idx, row, col, aug_fn)
             elif task == "summarization":
                 df = augment_summ(df, idx, row, col, aug_fn)
