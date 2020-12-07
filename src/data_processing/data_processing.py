@@ -3,7 +3,7 @@ from functools import partial
 
 
 def processing_from_name(df, ds_name, tokenizer, max_len):
-    if ds_name == "squad_v2":
+    if "squad" in ds_name:
         df = squad_v2_preprocessing(df, tokenizer, max_len)
     return df
 

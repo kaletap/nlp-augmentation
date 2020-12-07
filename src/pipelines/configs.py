@@ -30,6 +30,13 @@ squad_v2_config = {
     "y_col": ("tok_answer_start", "tok_answer_end"),
 }
 
+squad_v2_config = {
+    "ds_name": ("covid_squad",),
+    "max_len": 512,
+    "x_col": ("question", "context"),
+    "y_col": ("tok_answer_start", "tok_answer_end"),
+}
+
 summary_bart_config = {
     "pretrained_model_name": "facebook/bart-large-cnn", # to sie wypierdala jako czesc sciezki
     "model_class": transformers.BartForConditionalGeneration,
