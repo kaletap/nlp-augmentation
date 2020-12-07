@@ -20,6 +20,8 @@ def augment_data(df, task, aug_type, aug_repeat, x_cols):
 
 
 def augment_qa(df, idx, row, col, aug_fn):
+
+    row["answers"] = eval(row["answers"])
     assert len(row["answers"]["answer_start"]) == 1, "There is more than one answer to one" \
                                                      "context. It's not supported by this preprocessing"
 
