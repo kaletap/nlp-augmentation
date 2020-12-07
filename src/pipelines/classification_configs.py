@@ -84,11 +84,11 @@ yelp_config = {
 }
 
 dataset_configs = {
-    # "ag_news": ag_news_config,
-    # "imdb": imdb_config,
+    "ag_news": ag_news_config,
+    "imdb": imdb_config,
     "snli": snli_config,
     "twitter": twitter_config,
-    # "yelp": yelp_config
+    "yelp": yelp_config
 }
 
 keys = ag_news_config.keys()
@@ -192,5 +192,7 @@ cnn_classifier_config = {
 
 trainer_config_dict = {
     "batch_size": 64,
-    "cuda": True
+    "cuda": True,
+    "learning_rate": 0.001,
+    "weight_decay": 0.01
 }

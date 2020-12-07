@@ -5,8 +5,8 @@ from src.pipelines.classification_configs import augmentation_configs, dataset_c
 from src.pipelines.datasets import get_datasets
 
 # Setup
-ROOT_SAVE_DIR = "/kaggle/working"
-MLM_ROOT_PATH = "/kaggle/input/"  # "/content/drive/MyDrive/Colab Notebooks/nlp/pretrained_models"
+ROOT_SAVE_DIR = "examples"
+MLM_ROOT_PATH = "../mgr-code/"  # "/content/drive/MyDrive/Colab Notebooks/nlp/pretrained_models"
 
 for name, config in dataset_configs.items():
     if not config["train_sizes"]:
