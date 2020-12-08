@@ -5,6 +5,7 @@ import warnings
 from collections import defaultdict
 from datetime import datetime
 
+import pandas as pd
 from transformers import (
     AutoModelForSequenceClassification,
     AutoTokenizer,
@@ -35,7 +36,7 @@ USE_FINETUNED_MODEL_FOR_CLASSIFICATION = True
 def run_exp():
     tokenizer = AutoTokenizer.from_pretrained('roberta-base', use_fast=False)
 
-    accuracies = defaultdict(list)
+    results_df = pd.DataFrame(columns=["dataset", "augmentation", "training_size", "accuracy", "finetuned_clf"])
     print("Augmentation config:", augmentation_config)
     augmentation_name = augmentation_config["name"]
     for name, config in dataset_configs.items():
@@ -128,13 +129,17 @@ def run_exp():
             trainer.train()
 
             test_result = trainer.evaluate(test_dataset)
-            accuracies[name].append(test_result['eval_accuracy'])
-            with open(os.path.join(SAVE_DIR, f'{name}_{augmentation_config["name"]}_train_size_{train_size}.json'), 'w') as f:
-                json.dump(test_result, f, indent=4)
-            print(test_result)  # trainer.evaluate may print this as well (hence we see the same print two times)
-            with open(os.path.join(SAVE_DIR, 'accuracies.json'), 'w') as f:
-                json.dump(accuracies, f, indent=4)
-            print(accuracies)
+            print(test_result)
+            results_df = results_df.append({
+                "dataset": name,
+                "augmentation": augmentation_config["name"],
+                "training_size": train_size,
+                "accuracy": test_result["eval_accuracy"],
+                "finetuned_clf": USE_FINETUNED_MODEL_FOR_CLASSIFICATION
+            }, ignore_index=True)
+            results_df.to_csv(os.path.join(SAVE_DIR, 'results.csv'), index=False)
+            print(results_df)
+            # cleanup
             shutil.rmtree(output_dir, ignore_errors=True)
             print()
 
