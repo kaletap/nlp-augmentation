@@ -242,7 +242,7 @@ root_mlm_dir = {
 }
 
 root_training_csv_path = {
-    "kaggle": "kaggle/input/classification/",
+    "kaggle": "/kaggle/input/classification/",
     "colab": "/content/drive/MyDrive/Colab Notebooks/nlp/data",
     "local": "examples"
 }
