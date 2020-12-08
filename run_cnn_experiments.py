@@ -102,7 +102,7 @@ def run_exp():
                 print(val_dataset[0])
                 print(test_dataset[0])
 
-                num_train_epochs = {20: 10, 100: 10}.get(train_size, 5)
+                num_train_epochs = {20: 5, 100: 4}.get(train_size, 3)
 
                 output_dir = os.path.join(ROOT_OUTPUT_DIR, "cnn_model.pt")
                 trainer_config = TrainerConfig(ckpt_path=output_dir, max_epochs=num_train_epochs, **trainer_config_dict)
@@ -120,6 +120,7 @@ def run_exp():
                 # Loading the best model
                 model.load_state_dict(torch.load(output_dir))
                 test_result = trainer.evaluate(test_dataset)
+                print(test_result)
                 results_df = results_df.append({
                     "dataset": name,
                     "augmentation": augmentation_config["name"],
@@ -128,10 +129,7 @@ def run_exp():
                     "seq_len": tokenizer.max_length,
                     "accuracy": test_result["accuracy"]
                 }, ignore_index=True)
-                with open(os.path.join(SAVE_DIR, f'{name}_{augmentation_name}_train_size_{train_size}.json'), 'w') as f:
-                    json.dump(test_result, f, indent=4)
-                print(test_result)
-                results_df.to_csv(os.path.join(SAVE_DIR, 'results.csv'))
+                results_df.to_csv(os.path.join(SAVE_DIR, 'results.csv'), index=False)
                 print(results_df)
                 shutil.rmtree(output_dir, ignore_errors=True)
                 print()

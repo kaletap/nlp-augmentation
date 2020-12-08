@@ -72,6 +72,26 @@ class DatasetFromCsv(Dataset):
         return {column: row[column] for column in self.dataset_df.columns}
 
 
+class ConditionalDataset(Dataset):
+    def __init__(self, dataset, config, sep_token):
+        self.dataset = dataset
+        self.config = config
+        self.sep_token = sep_token
+        if hasattr(dataset, "column_names"):
+            self.column_names = dataset.column_names
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, i):
+        row = self.dataset[i]
+        text_colname = self.config["text_colname"]
+        text, label = row[text_colname], row[self.config["label_colname"]]
+        conditioned_text = self.config["label_map"][label] + f" {self.sep_token} " + text
+        row[text_colname] = conditioned_text
+        return row
+
+
 def get_datasets(dataset_name, augmenter=None, train_size=10_000, val_size=5_000, test_size=None, augmentation_prob=0.7,
                  random_seed: int = 42, load_test=False, filter_func=None, text_columns=None, merge_text_columns=True,
                  sep_token=None, training_csv_path=None):
