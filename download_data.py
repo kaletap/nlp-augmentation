@@ -72,8 +72,8 @@ PARAMS_LIST = [
              # (500, "qa", ("context",), {"type": "rules", "repeat": 20}),
              # (1000, "qa", ("context",), {"type": "rules", "repeat": 10}),
              # (100, "qa", ("context",), {"type": "LM", "repeat": 100}), # 100 original and 9900 augmented
-             (500, "qa", ("context",), {"type": "LM", "repeat": 20}), # 1000 original and 9000 augmented
-             (1000, "qa", ("context",), {"type": "LM", "repeat": 10}), # 5000 original and 5000 augmented
+             # (500, "qa", ("context",), {"type": "LM", "repeat": 20}), # 1000 original and 9000 augmented
+             # (1000, "qa", ("context",), {"type": "LM", "repeat": 10}), # 5000 original and 5000 augmented
              (1500, "qa", ("context",), {"type": "LM", "repeat": 7}), # 5000 original and 5000 augmented
         ],
     ],
