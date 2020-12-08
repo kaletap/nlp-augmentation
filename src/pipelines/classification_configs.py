@@ -225,3 +225,23 @@ trainer_config_dict = {
     "learning_rate": 0.001,
     "weight_decay": 0.01
 }
+
+# Directories
+
+root_output_dir = {
+    "kaggle": "/kaggle/working",
+    "colab": "/content/drive/MyDrive/Colab Notebooks/nlp/results",
+    "local": "examples"
+}
+
+root_mlm_dir = {
+    "kaggle": "/kaggle/input/",
+    "colab": "/content/drive/MyDrive/Colab Notebooks/nlp/pretrained_models",
+    "local": "../mgr-code"
+}
+
+root_training_csv_path = {
+    "kaggle": "kaggle/input/classification/",
+    "colab": "/content/drive/MyDrive/Colab Notebooks/nlp/data",
+    "local": "examples"
+}

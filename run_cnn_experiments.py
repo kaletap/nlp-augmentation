@@ -13,7 +13,10 @@ from src.pipelines.classification_configs import (
     augmentation_configs,
     cnn_classifier_config,
     dataset_configs,
-    trainer_config_dict
+    trainer_config_dict,
+    root_mlm_dir,
+    root_output_dir,
+    root_training_csv_path
 )
 from src.pipelines.datasets import get_datasets,  DatasetWithTokenization
 from src.training_utils import Trainer, TrainerConfig
@@ -21,29 +24,11 @@ from src.training_utils import Trainer, TrainerConfig
 
 PLATFORM = "local"
 
-root_output_dir = {
-    "kaggle": "/kaggle/working",
-    "colab": "/content/drive/MyDrive/Colab Notebooks/nlp/results",
-    "local": "examples"
-}
-
-root_mlm_dir = {
-    "kaggle": "/kaggle/input/",
-    "colab": "/content/drive/MyDrive/Colab Notebooks/nlp/pretrained_models",
-    "local": "../mgr-code"
-}
-
-root_training_csv_path = {
-    "kaggle": "kaggle/input",
-    "colab": "/content/drive/MyDrive/Colab Notebooks/nlp/data",
-    "local": "examples"
-}
-
 # Setup
 ROOT_OUTPUT_DIR = root_output_dir[PLATFORM]
-SAVE_DIR = "."
 ROOT_MLM_DIR = root_mlm_dir[PLATFORM]
 ROOT_TRAINING_CSV_PATH = root_training_csv_path[PLATFORM]
+SAVE_DIR = "."
 
 
 def run_exp():

@@ -13,15 +13,22 @@ from transformers import (
 )
 
 from src.data_processing import DataCollator
-from src.pipelines.classification_configs import dataset_configs
+from src.pipelines.classification_configs import (
+    dataset_configs,
+    root_mlm_dir,
+    root_output_dir,
+    root_training_csv_path
+)
 from src.pipelines.classification_configs import mlm_insertion_config as augmentation_config
 from src.pipelines.datasets import get_datasets
 
 
 # Setup
-ROOT_OUTPUT_DIR = "/kaggle/working/"  # "/content/drive/MyDrive/Colab Notebooks/nlp/results"
-SAVE_DIR = "."  # ROOT_OUTPUT_DIR
-MLM_ROOT_PATH = "/kaggle/input/"  # "/content/drive/MyDrive/Colab Notebooks/nlp/pretrained_models"
+PLATFORM = "local"
+ROOT_OUTPUT_DIR = root_output_dir[PLATFORM]
+ROOT_MLM_DIR = root_mlm_dir[PLATFORM]
+ROOT_TRAINING_CSV_PATH = root_training_csv_path[PLATFORM]
+SAVE_DIR = "."
 USE_FINETUNED_MODEL_FOR_CLASSIFICATION = True
 
 
