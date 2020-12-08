@@ -181,6 +181,13 @@ swap_config = {
     "augmentation_prob": 0.7
 }
 
+wordnet_config = {
+    "name": "wordnet",
+    "class": RuleBasedAugmenter,
+    "augmenter_parameters": dict(),
+    "augmentation_prob": 0.7
+}
+
 bart_augmenter_config = {
     "name": "bart_augmentation",
     "class": BartAugmenter,
@@ -202,8 +209,7 @@ no_augmenter_config = {
 
 # Classification model config
 
-augmentation_configs = [no_augmenter_config, swap_config, mlm_insertion_config, mlm_substitution_config,
-                        finetuned_mlm_insertion_config, finetuned_mlm_substitution_config]
+augmentation_configs = [wordnet_config]
 
 cnn_classifier_config = {
     "embedding_size": 128,
