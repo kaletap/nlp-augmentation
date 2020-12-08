@@ -37,38 +37,43 @@ def run_exp():
 
     accuracies = defaultdict(list)
     print("Augmentation config:", augmentation_config)
+    augmentation_name = augmentation_config["name"]
     for name, config in dataset_configs.items():
         print("Dataset:", name, "config:", config)
         mlm_relative_path = config.get("mlm_relative_path", None)
-        use_finetuned = augmentation_config.get("use_finetuned", None)
-        if use_finetuned and not mlm_relative_path:
-            warnings.warn(f"You are asking to use finetuned model for dataset {name} but do not provide path to the"
-                          f"pretrained model")
-        if use_finetuned and mlm_relative_path:
-            mlm_path = os.path.join(MLM_ROOT_PATH, mlm_relative_path)
-            print(f"Loading model for augmentation from {mlm_path}")
-            augmenter = augmentation_config["class"](model_name_or_path=mlm_path, **augmentation_config["augmenter_parameters"])
+        if ROOT_TRAINING_CSV_PATH:  # we won't use augmenter since we are loading augmented data
+            augmenter = None
         else:
-            augmenter = augmentation_config["class"](**augmentation_config["augmenter_parameters"])
+            use_finetuned = augmentation_config.get("use_finetuned", None)
+            if use_finetuned and not mlm_relative_path:
+                warnings.warn(f"You are asking to use finetuned model for dataset {name} but do not provide path to the"
+                              f"pretrained model")
+            if use_finetuned and mlm_relative_path:
+                mlm_path = os.path.join(ROOT_MLM_DIR, mlm_relative_path)
+                print(f"Loading model for augmentation from {mlm_path}")
+                augmenter = augmentation_config["class"](model_name_or_path=mlm_path, **augmentation_config["augmenter_parameters"])
+            else:
+                augmenter = augmentation_config["class"](**augmentation_config["augmenter_parameters"])
         for train_size in config["train_sizes"]:
             data_collator = DataCollator(tokenizer, text_colname="text", label_colname=config["label_colname"])
             if USE_FINETUNED_MODEL_FOR_CLASSIFICATION:
-                model_name_or_path = os.path.join(MLM_ROOT_PATH, mlm_relative_path)
+                model_name_or_path = os.path.join(ROOT_MLM_DIR, mlm_relative_path)
                 print(f"Loading model for classification from {model_name_or_path}")
             else:
                 model_name_or_path = "roberta-base"
             model = AutoModelForSequenceClassification.from_pretrained(model_name_or_path, return_dict=True, num_labels=config["num_labels"])
-
+            training_csv_path = os.path.join(ROOT_TRAINING_CSV_PATH, name, augmentation_name, f"{train_size}.csv")
             train_dataset, val_dataset, test_dataset = get_datasets(
                 config["dataset_name"],
-                augmenter,
-                train_size,
+                augmenter=augmenter,
+                train_size=train_size,
                 val_size=config["val_size"],
                 test_size=config["test_size"],
                 augmentation_prob=augmentation_config["augmentation_prob"],
                 load_test=config["load_test"],
                 text_columns=config["text_colname"],
-                sep_token=tokenizer.sep_token
+                sep_token=tokenizer.sep_token,
+                training_csv_path=training_csv_path
             )
             print("Time:", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
             print(f"Train size: {len(train_dataset)}, Validation size: {len(val_dataset)}, Test size: {len(test_dataset)}")
@@ -76,16 +81,19 @@ def run_exp():
             print(val_dataset[0])
             print(test_dataset[0])
 
-            num_train_epochs = {
-                20: 10,
-                100: 10,
-                1000: 7,
-                2_500: 6,
-                10_000: 6,
-                100_000: 3
-            }.get(train_size, 6)
-            if train_size > 50_000:
-                num_train_epochs = 3
+            if ROOT_TRAINING_CSV_PATH:  # less epochs since we have a lot of data
+                num_train_epochs = 2
+            else:
+                num_train_epochs = {
+                    20: 10,
+                    100: 10,
+                    1000: 7,
+                    2_500: 6,
+                    10_000: 6,
+                    100_000: 3
+                }.get(train_size, 6)
+                if train_size > 50_000:
+                    num_train_epochs = 3
 
             output_dir = os.path.join(ROOT_OUTPUT_DIR, f'{name}_{augmentation_config["name"]}_train_size_{train_size}')
             # https://huggingface.co/transformers/main_classes/trainer.html#trainingarguments
