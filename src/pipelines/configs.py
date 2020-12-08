@@ -30,7 +30,7 @@ squad_v2_config = {
     "y_col": ("tok_answer_start", "tok_answer_end"),
 }
 
-squad_v2_config = {
+covid_squad_config = {
     "ds_name": ("covid_squad",),
     "max_len": 512,
     "x_col": ("question", "context"),
@@ -129,6 +129,6 @@ experiments_setup = {
     "seeds": (9, ),# 9, 11, 21, 37]
     "tasks": {
         "summarization": ((pipeline.SummarizationPipeline, {**summary_bart_config, **cnn_dailymail_config, **common_config})),
-        "qa": ((pipeline.QuestionAnsweringPipeline, {**qa_bert_config, **squad_v2_config, **common_config}))
+        "qa": ((pipeline.QuestionAnsweringPipeline, {**qa_bert_config, **covid_squad_config, **common_config}))
     },
 }
