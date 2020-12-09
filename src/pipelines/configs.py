@@ -25,20 +25,20 @@ cnn_dailymail_config = {
 
 squad_v2_config = {
     "ds_name": ("squad_v2",),
-    "max_len": 156,
+    "max_len": 512,
     "x_col": ("question", "context"),
     "y_col": ("tok_answer_start", "tok_answer_end"),
 }
 
 covid_squad_config = {
     "ds_name": ("covid_squad",),
-    "max_len": 156,
+    "max_len": 512,
     "x_col": ("question", "context"),
     "y_col": ("tok_answer_start", "tok_answer_end"),
 }
 
 summary_bart_config = {
-    "pretrained_model_name": "facebook/bart-large-cnn", # to sie wypierdala jako czesc sciezki
+    "pretrained_model_name": "facebook/bart-large-cnn",
     "model_class": transformers.BartForConditionalGeneration,
     "task": "summarization",
     "opt_func": optimizer.ranger,
