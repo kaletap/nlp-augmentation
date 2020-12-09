@@ -3,6 +3,7 @@ from .augmentations import (
     MLMInsertionAugmenter,
     MLMSubstitutionAugmenter,
     NoAugmenter,
-    RandomWordAugmenter
+    RandomWordAugmenter,
+    RuleBasedAugmenter
 )
 from .augment_dataset import augment_dataset

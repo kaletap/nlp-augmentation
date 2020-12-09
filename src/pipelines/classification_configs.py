@@ -181,6 +181,13 @@ swap_config = {
     "augmentation_prob": 0.7
 }
 
+wordnet_config = {
+    "name": "wordnet",
+    "class": RuleBasedAugmenter,
+    "augmenter_parameters": dict(),
+    "augmentation_prob": 0.7
+}
+
 bart_augmenter_config = {
     "name": "bart_augmentation",
     "class": BartAugmenter,
@@ -202,8 +209,8 @@ no_augmenter_config = {
 
 # Classification model config
 
-augmentation_configs = [no_augmenter_config, swap_config, mlm_insertion_config, mlm_substitution_config,
-                        finetuned_mlm_insertion_config, finetuned_mlm_substitution_config]
+augmentation_configs = [no_augmenter_config, swap_config, wordnet_config, mlm_substitution_config, mlm_insertion_config,
+                        finetuned_mlm_insertion_config, finetuned_mlm_insertion_config]
 
 cnn_classifier_config = {
     "embedding_size": 128,
@@ -218,4 +225,24 @@ trainer_config_dict = {
     "cuda": True,
     "learning_rate": 0.001,
     "weight_decay": 0.01
+}
+
+# Directories
+
+root_output_dir = {
+    "kaggle": "/kaggle/working",
+    "colab": "/content/drive/MyDrive/Colab Notebooks/nlp/results",
+    "local": "examples"
+}
+
+root_mlm_dir = {
+    "kaggle": "/kaggle/input/",
+    "colab": "/content/drive/MyDrive/Colab Notebooks/nlp/pretrained_models",
+    "local": "../mgr-code"
+}
+
+root_training_csv_path = {
+    "kaggle": "/kaggle/input/classification/",
+    "colab": "/content/drive/MyDrive/Colab Notebooks/nlp/data",
+    "local": "examples"
 }
