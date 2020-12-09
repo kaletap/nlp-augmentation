@@ -11,12 +11,9 @@ def processing_from_name(df, ds_name, tokenizer, max_len):
 
 def squad_v2_preprocessing(df, tokenizer, max_len):
     df['answers'] = df['answers'].map(ast.literal_eval)
-    # df["is_impossible"] = df["answers"].apply(lambda x: len(x["answer_start"]) == 0)
-    # df = df[df.is_impossible == False]
 
     params = tokenizer, max_len
     df = df.apply(partial(fixed_pre_process_squad, params=params), axis=1)
-    # df = df[df["tokenized_input"].apply(lambda x: len(x) < max_len)]
     print(f"df.shape {df.shape}")
     return df
 
@@ -33,7 +30,6 @@ def fixed_pre_process_squad(row, params):
     else:
         tok_input = hf_tokenizer.convert_ids_to_tokens(hf_tokenizer.encode(context, qst, **tok_kwargs))
 
-    # trim tokens
     seq_len = len(tok_input)
     if seq_len > max_len:
         trim = (seq_len - max_len) // 2
