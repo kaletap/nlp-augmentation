@@ -1,5 +1,7 @@
 from .augmentations import (
     BartAugmenter,
+    ConditionalMLMInsertionAugmenter,
+    ConditionalMLMSubstitutionAugmenter,
     MLMInsertionAugmenter,
     MLMSubstitutionAugmenter,
     NoAugmenter,

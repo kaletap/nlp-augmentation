@@ -41,7 +41,7 @@ class RuleBasedAugmenter:
     def __init__(self):
         self.augmenter = naw.SynonymAug(aug_src='wordnet')
 
-    def __call__(self, text: str):
+    def __call__(self, text: str, label: str = None):
         augmented_text = self.augmenter.augment(text)
         return augmented_text
 
@@ -53,7 +53,7 @@ class RandomWordAugmenter:
     def __init__(self, action="swap", *args, **kwargs):
         self.augmenter = naw.RandomWordAug(action=action, *args, **kwargs)
 
-    def __call__(self, text: str):
+    def __call__(self, text: str, label: str = None):
         augmented_text = self.augmenter.augment(text)
         return augmented_text
 
@@ -62,10 +62,10 @@ class MLMAugmenter(ABC):
     def __init__(self, model_name_or_path=None, tokenizer=None, min_fraction: float = 0.05, max_fraction: float = 0.25,
                  min_mask: int = 1, max_mask: int = 100, topk: int = 10, uniform: bool = False, device=None):
         """
-        :param model: huggingface/transformers model for masked language modeling
-            e.g model = RobertaForMaskedLM.from_pretrained('roberta-base', return_dict=True)
+        :param model_name_or_path: huggingface/transformers model name (e.g. 'roberta-base') or a path to a model
         :param tokenizer: huggingface/transformers tokenizer
             e.g tokenizer = RobertaTokenizer.from_pretrained('roberta-base')
+            Make sure it is compatible with model_name_or_path
         :param min_fraction: minimum fraction of words to substitute/insert
         :param max_fraction: maximum fraction of words to substitute/insert
         :param min_mask: minimum number of tokens to mask
@@ -294,7 +294,7 @@ class BartAugmenter:
         self.lambda_ = lambda_
         self.num_beams = num_beams
 
-    def __call__(self, text: str, fraction: float = None):
+    def __call__(self, text: str, label: str = None, fraction: float = None):
         if self.fraction == 0:
             return text
 
@@ -343,5 +343,5 @@ class BartAugmenter:
 
 
 class NoAugmenter:
-    def __call__(self, text: str):
+    def __call__(self, text: str, label: str = None):
         return text
