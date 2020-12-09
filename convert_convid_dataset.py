@@ -81,7 +81,7 @@ valid = data["data"][:size]
 
 splits = [
     ("train_", train),
-    ("valid_", valid),
+    ("validation_", valid),
 ]
 
 
