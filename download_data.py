@@ -3,7 +3,7 @@ import pandas as pd
 
 from src.training_utils import data_downloading
 
-FOLDER = "./data" # "/kaggle/input/covid-squad"
+FOLDER = "/kaggle/input/covid-squad"
 
 max_len = 300
 
