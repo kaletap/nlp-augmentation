@@ -32,7 +32,7 @@ squad_v2_config = {
 
 covid_squad_config = {
     "ds_name": ("covid_squad",),
-    "max_len": 512,
+    "max_len": 156,
     "x_col": ("question", "context"),
     "y_col": ("tok_answer_start", "tok_answer_end"),
 }
