@@ -23,16 +23,17 @@ from src.pipelines.datasets import get_datasets
 
 
 # Setup
-PLATFORM = "colab"
+PLATFORM = "kaggle"
 ROOT_OUTPUT_DIR = root_output_dir[PLATFORM]
 ROOT_MLM_DIR = root_mlm_dir[PLATFORM]
 ROOT_TRAINING_CSV_PATH = root_training_csv_path[PLATFORM]
 SAVE_DIR = "."
 # USE_FINETUNED_MODEL_FOR_CLASSIFICATION = True
+TRANSFORMER_MODEL_NAME = "albert-base-v2"
 
 
 def run_exp():
-    tokenizer = AutoTokenizer.from_pretrained('roberta-base', use_fast=False)
+    tokenizer = AutoTokenizer.from_pretrained(TRANSFORMER_MODEL_NAME, use_fast=False)
 
     results_df = pd.DataFrame(columns=["dataset", "augmentation", "training_size", "accuracy", "finetuned_clf"])
     for name, config in dataset_configs.items():
@@ -61,7 +62,7 @@ def run_exp():
                         model_name_or_path = os.path.join(ROOT_MLM_DIR, mlm_relative_path)
                         print(f"Loading model for classification from {model_name_or_path}")
                     else:
-                        model_name_or_path = "roberta-base"
+                        model_name_or_path = TRANSFORMER_MODEL_NAME
                     model = AutoModelForSequenceClassification.from_pretrained(model_name_or_path, return_dict=True,
                                                                                num_labels=config["num_labels"])
                     training_csv_path = os.path.join(ROOT_TRAINING_CSV_PATH, name, augmentation_name, f"{train_size}.csv")
