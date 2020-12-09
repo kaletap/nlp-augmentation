@@ -107,9 +107,9 @@ yelp_config = {
 }
 
 dataset_configs = {
-    "ag_news": ag_news_config,
+    # "ag_news": ag_news_config,
     # "imdb": imdb_config,
-    "snli": snli_config,
+    # "snli": snli_config,
     "twitter": twitter_config,
     "yelp": yelp_config
 }
@@ -209,7 +209,7 @@ no_augmenter_config = {
 
 # Classification model config
 
-augmentation_configs = [no_augmenter_config, swap_config, wordnet_config, mlm_substitution_config, mlm_insertion_config,
+augmentation_configs = [no_augmenter_config, swap_config, wordnet_config, mlm_insertion_config, mlm_substitution_config,
                         finetuned_mlm_insertion_config, finetuned_mlm_insertion_config]
 
 cnn_classifier_config = {
