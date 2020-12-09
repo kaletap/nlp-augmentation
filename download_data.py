@@ -58,15 +58,15 @@ PARAMS_LIST = [
         "train",
         [
              # ("all", "qa", ("context",), {"type": "no_aug", "repeat": 1}),
-             (100, "qa", ("context",), {"type": "no_aug", "repeat": 100}),
-             (500, "qa", ("context",), {"type": "no_aug", "repeat": 20}),
-             (1500, "qa", ("context",), {"type": "no_aug", "repeat": 7}),
-             (100, "qa", ("context",), {"type": "rules", "repeat": 100}),
-             (500, "qa", ("context",), {"type": "rules", "repeat": 20}),
-             (1500, "qa", ("context",), {"type": "rules", "repeat": 7}),
+             # (100, "qa", ("context",), {"type": "no_aug", "repeat": 100}),
+             # (500, "qa", ("context",), {"type": "no_aug", "repeat": 20}),
+             # (1500, "qa", ("context",), {"type": "no_aug", "repeat": 7}),
+             # (100, "qa", ("context",), {"type": "rules", "repeat": 100}),
+             # (500, "qa", ("context",), {"type": "rules", "repeat": 20}),
+             # (1500, "qa", ("context",), {"type": "rules", "repeat": 7}),
              # (100, "qa", ("context",), {"type": "LM", "repeat": 100}), # 100 original and 9900 augmented
-             # (500, "qa", ("context",), {"type": "LM", "repeat": 20}), # 1000 original and 9000 augmented
-             # (1500, "qa", ("context",), {"type": "LM", "repeat": 7}), # 5000 original and 5000 augmented
+             (500, "qa", ("context",), {"type": "LM", "repeat": 20}), # 1000 original and 9000 augmented
+             (1500, "qa", ("context",), {"type": "LM", "repeat": 7}), # 5000 original and 5000 augmented
         ],
     ],
     # [

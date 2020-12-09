@@ -28,11 +28,11 @@ def augment_qa(df, idx, row, col, aug_fn, max_len):
     answer_start, answer_txt = answer["answer_start"][0], answer["text"][0]
     text = row[col]
 
-    ans_word_count = len(answer.split())
+    ans_word_count = len(answer_txt.split())
     max_len = (max_len - ans_word_count) // 2
 
     context_first_part = " ".join(text[:answer_start].strip().split()[-max_len:])
-    context_second_part = " ".join(text[answer_start + len(answer):].strip().split()[:max_len])
+    context_second_part = " ".join(text[answer_start + len(answer_txt):].strip().split()[:max_len])
 
     aug_context_first_part = aug_fn(context_first_part) + " "
     aug_context_second_part = " " + aug_fn(context_second_part)
