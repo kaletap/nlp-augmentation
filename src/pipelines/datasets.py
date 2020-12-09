@@ -87,6 +87,9 @@ class ConditionalDataset(Dataset):
         row = self.dataset[i]
         text_colname = self.config["text_colname"]
         text, label = row[text_colname], row[self.config["label_colname"]]
+        # hack for twitter dataset (the same as in data_collator)
+        if self.config["dataset_name"] == "sentiment140":
+            label = 0 if label == 0 else 1
         conditioned_text = self.config["label_map"][label] + f" {self.sep_token} " + text
         row[text_colname] = conditioned_text
         return row
