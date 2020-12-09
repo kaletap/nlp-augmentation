@@ -100,6 +100,12 @@ class DataTrainingArguments:
             "help": "Size of training dataset."
         },
     )
+    test_size: float = field(
+        default=0.05,
+        metadata={
+            "help": "Percentage of training dataset to use for validation."
+        },
+    )
     overwrite_cache: bool = field(
         default=False, metadata={"help": "Overwrite the cached training and evaluation sets"}
     )
@@ -130,7 +136,7 @@ class DataTrainingArguments:
     )
 
 
-def main(train_size=1000):
+def main():
     # See all possible arguments in src/transformers/training_args.py
     # or by passing the --help flag to this script.
     # We now keep distinct sets of args, for a cleaner separation of concerns.
@@ -224,7 +230,7 @@ def main(train_size=1000):
     torch_dataset, _, _ = get_datasets(
         config["dataset_name"],
         augmenter=None,
-        train_size=train_size,
+        train_size=data_args.train_size,
         val_size=config["val_size"],
         test_size=config["test_size"],
         augmentation_prob=0,
@@ -232,14 +238,16 @@ def main(train_size=1000):
         text_columns=config["text_colname"]
     )
     conditional_dataset = ConditionalDataset(torch_dataset, config=config, sep_token=tokenizer.sep_token)
+    print(f"Created ConditionalDataset of size {len(conditional_dataset)}")
+    print("Example from conditional dataset:", conditional_dataset[0])
     # Converting to dict as a workaround to read it into huggingface's Dataset
     column_names = conditional_dataset.column_names
     dataset_dict = defaultdict(list)
     for row in conditional_dataset:
         for col in column_names:
             dataset_dict[col].append(row[col])
-    print("Example from conditional dataset:", conditional_dataset[0])
-    datasets = Dataset.from_dict(dataset_dict).train_test_split(test_size=0.05)
+    datasets = Dataset.from_dict(dataset_dict).train_test_split(test_size=data_args.test_size)
+    print(f"Created huggingface Dataset: train size: {len(datasets['train'])}, test size: {len(datasets['test'])}")
 
     # Preprocessing the datasets.
     # First we tokenize all the texts.
@@ -387,6 +395,7 @@ def _mp_fn(index):
 # --per_device_train_batch_size 1 \
 # --per_device_eval_batch_size 1 \
 # --gradient_accumulation_steps 8 \
-# --logging_steps 1
+# --logging_steps 1 \
+# --train_size 1000 \
 if __name__ == "__main__":
     main()
