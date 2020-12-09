@@ -14,13 +14,15 @@ def squad_v2_preprocessing(df, tokenizer, max_len):
     # df["is_impossible"] = df["answers"].apply(lambda x: len(x["answer_start"]) == 0)
     # df = df[df.is_impossible == False]
 
-    df = df.apply(partial(fixed_pre_process_squad, hf_tokenizer=tokenizer), axis=1)
-    df = df[df["tokenized_input"].apply(lambda x: len(x) < max_len)]
+    params = tokenizer, max_len
+    df = df.apply(partial(fixed_pre_process_squad, params=params), axis=1)
+    # df = df[df["tokenized_input"].apply(lambda x: len(x) < max_len)]
     print(f"df.shape {df.shape}")
     return df
 
 
-def fixed_pre_process_squad(row, hf_tokenizer):
+def fixed_pre_process_squad(row, params):
+    hf_tokenizer, max_len = params
     context, qst, ans = row['context'], row['question'], row['answers']
 
     tok_kwargs = {}
@@ -32,7 +34,11 @@ def fixed_pre_process_squad(row, hf_tokenizer):
         tok_input = hf_tokenizer.convert_ids_to_tokens(hf_tokenizer.encode(context, qst, **tok_kwargs))
 
     # trim tokens
-
+    seq_len = len(tok_input)
+    if seq_len > max_len:
+        trim = (seq_len - max_len) // 2
+        tok_input = tok_input[trim:]
+        tok_input = tok_input[:-trim]
 
     start_idx, end_idx = 0, 0
     if not (ans['answer_start'] == 0 and len(ans['text']) == 0):
