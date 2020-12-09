@@ -15,6 +15,7 @@ def squad_v2_preprocessing(df, tokenizer, max_len):
 
     df = df.apply(partial(fixed_pre_process_squad, hf_tokenizer=tokenizer), axis=1)
     df = df[df["tokenized_input"].apply(lambda x: len(x) < max_len)]
+    print(f"df.shape {df.shape}")
     return df
 
 

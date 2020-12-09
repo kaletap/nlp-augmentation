@@ -3,7 +3,7 @@ import pandas as pd
 
 from src.training_utils import data_downloading
 
-FOLDER = "/kaggle/input/covid-squad"
+FOLDER = "./data" # "/kaggle/input/covid-squad"
 
 def load_df(dataset_name, split):
     if "covid" in dataset_name[0]:
@@ -67,13 +67,12 @@ PARAMS_LIST = [
              # ("all", "qa", ("context",), {"type": "no_aug", "repeat": 1}),
              # (100, "qa", ("context",), {"type": "no_aug", "repeat": 100}),
              # (500, "qa", ("context",), {"type": "no_aug", "repeat": 20}),
-             # (1000, "qa", ("context",), {"type": "no_aug", "repeat": 10}),
+             (1500, "qa", ("context",), {"type": "no_aug", "repeat": 7}),
              # (100, "qa", ("context",), {"type": "rules", "repeat": 100}),
              # (500, "qa", ("context",), {"type": "rules", "repeat": 20}),
-             # (1000, "qa", ("context",), {"type": "rules", "repeat": 10}),
+             (1500, "qa", ("context",), {"type": "rules", "repeat": 7}),
              # (100, "qa", ("context",), {"type": "LM", "repeat": 100}), # 100 original and 9900 augmented
-             (500, "qa", ("context",), {"type": "LM", "repeat": 20}), # 1000 original and 9000 augmented
-             # (1000, "qa", ("context",), {"type": "LM", "repeat": 10}), # 5000 original and 5000 augmented
+             # (500, "qa", ("context",), {"type": "LM", "repeat": 20}), # 1000 original and 9000 augmented
              # (1500, "qa", ("context",), {"type": "LM", "repeat": 7}), # 5000 original and 5000 augmented
         ],
     ],
