@@ -138,7 +138,7 @@ def run_exp():
                         "accuracy": test_result["eval_accuracy"],
                         "finetuned_clf": USE_FINETUNED_MODEL_FOR_CLASSIFICATION
                     }, ignore_index=True)
-                    results_df.to_csv(os.path.join(SAVE_DIR, 'results.csv'), index=False)
+                    results_df.to_csv(os.path.join(ROOT_OUTPUT_DIR, 'results.csv'), index=False)
                     print(results_df)
                     # cleanup
                     shutil.rmtree(output_dir, ignore_errors=True)
