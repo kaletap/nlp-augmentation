@@ -23,7 +23,7 @@ from src.pipelines.datasets import get_datasets
 
 
 # Setup
-PLATFORM = "kaggle"
+PLATFORM = "colab"
 ROOT_OUTPUT_DIR = root_output_dir[PLATFORM]
 ROOT_MLM_DIR = root_mlm_dir[PLATFORM]
 ROOT_TRAINING_CSV_PATH = root_training_csv_path[PLATFORM]
