@@ -1,3 +1,4 @@
+import re
 import ast
 from functools import partial
 
@@ -12,8 +13,6 @@ def squad_v2_preprocessing(df, tokenizer, max_len):
     df['answers'] = df['answers'].map(ast.literal_eval)
     # df["is_impossible"] = df["answers"].apply(lambda x: len(x["answer_start"]) == 0)
     # df = df[df.is_impossible == False]
-
-    import pdb;pdb.set_trace()
 
     df = df.apply(partial(fixed_pre_process_squad, hf_tokenizer=tokenizer), axis=1)
     df = df[df["tokenized_input"].apply(lambda x: len(x) < max_len)]
@@ -31,9 +30,6 @@ def fixed_pre_process_squad(row, hf_tokenizer):
         tok_input = hf_tokenizer.convert_ids_to_tokens(hf_tokenizer.encode(qst, context, **tok_kwargs))
     else:
         tok_input = hf_tokenizer.convert_ids_to_tokens(hf_tokenizer.encode(context, qst, **tok_kwargs))
-
-    import pdb;
-    pdb.set_trace()
 
     start_idx, end_idx = 0, 0
     if not (ans['answer_start'] == 0 and len(ans['text']) == 0):
