@@ -41,7 +41,7 @@ class RuleBasedAugmenter:
     def __init__(self):
         self.augmenter = naw.SynonymAug(aug_src='wordnet')
 
-    def __call__(self, text: str):
+    def __call__(self, text: str, label: str = None):
         augmented_text = self.augmenter.augment(text)
         return augmented_text
 
@@ -53,7 +53,7 @@ class RandomWordAugmenter:
     def __init__(self, action="swap", *args, **kwargs):
         self.augmenter = naw.RandomWordAug(action=action, *args, **kwargs)
 
-    def __call__(self, text: str):
+    def __call__(self, text: str, label: str = None):
         augmented_text = self.augmenter.augment(text)
         return augmented_text
 
@@ -62,10 +62,10 @@ class MLMAugmenter(ABC):
     def __init__(self, model_name_or_path=None, tokenizer=None, min_fraction: float = 0.05, max_fraction: float = 0.25,
                  min_mask: int = 1, max_mask: int = 100, topk: int = 10, uniform: bool = False, device=None):
         """
-        :param model: huggingface/transformers model for masked language modeling
-            e.g model = RobertaForMaskedLM.from_pretrained('roberta-base', return_dict=True)
+        :param model_name_or_path: huggingface/transformers model name (e.g. 'roberta-base') or a path to a model
         :param tokenizer: huggingface/transformers tokenizer
             e.g tokenizer = RobertaTokenizer.from_pretrained('roberta-base')
+            Make sure it is compatible with model_name_or_path
         :param min_fraction: minimum fraction of words to substitute/insert
         :param max_fraction: maximum fraction of words to substitute/insert
         :param min_mask: minimum number of tokens to mask
@@ -107,12 +107,12 @@ class MLMAugmenter(ABC):
         return word
 
     @abstractmethod
-    def __call__(self, text: str, fraction: float = None):
+    def __call__(self, text: str, label: str = None, fraction: float = None):
         pass
 
 
 class MLMInsertionAugmenter(MLMAugmenter):
-    def __call__(self, text: str, fraction: float = None):
+    def __call__(self, text: str, label: str = None, fraction: float = None):
         if self.max_fraction == 0:
             return text
         words = np.array(text.split(), dtype='object')
@@ -121,7 +121,7 @@ class MLMInsertionAugmenter(MLMAugmenter):
         n_mask = max(self.min_mask, int(min(max_len, len(words)) * fraction))
         n_mask = min(n_mask, self.max_mask)
         max_masked_idx = min(self.tokenizer.model_max_length // 2 - n_mask,
-                             len(words) + 1)  # offset, since lenght might increase after tokenization
+                             len(words) + 1)  # offset, since length might increase after tokenization
         # end of the long text won't be augmented, but I guess we can live with that
         masked_indices = np.sort(np.random.choice(max_masked_idx, size=n_mask, replace=False))
         masked_words = np.insert(words, masked_indices, self.mask_token)
@@ -141,8 +141,8 @@ class MLMInsertionAugmenter(MLMAugmenter):
         return new_text
 
 
-class MLMSubstitutionAugmenter(MLMInsertionAugmenter):
-    def __call__(self, text: str, fraction: float = None):
+class MLMSubstitutionAugmenter(MLMAugmenter):
+    def __call__(self, text: str, label: str = None, fraction: float = None):
         if self.max_fraction == 0:
             return text
         try:
@@ -151,7 +151,7 @@ class MLMSubstitutionAugmenter(MLMInsertionAugmenter):
             fraction = fraction or self.min_fraction + (self.max_fraction - self.min_fraction) * np.random.random()
             n_mask = max(self.min_mask, int(min(max_len, len(words)) * fraction))
             n_mask = min(n_mask, self.max_mask)
-            # offset, since lenght might increase after tokenization
+            # offset, since length might increase after tokenization
             max_masked_idx = min(max_len // 2, len(words) + 1)
             vocab_word_indices = [i for i, word in itertools.islice(enumerate(words), max_masked_idx)
                                   if self.substitute_word(word)]
@@ -162,6 +162,88 @@ class MLMSubstitutionAugmenter(MLMInsertionAugmenter):
             masked_words = words[masked_indices]
             words[masked_indices] = self.mask_token
             masked_text = " ".join(words)
+            masked_text = label + f" {self.tokenizer.sep_token} " + masked_text
+
+            tokenizer_output = self.tokenizer([masked_text], truncation=True)
+            input_ids = torch.tensor(tokenizer_output['input_ids']).to(self.device)
+            with torch.no_grad():
+                output = self.model(input_ids)
+                predicted_logits = output.logits[input_ids == self.mask_token_id]
+                predicted_probas = predicted_logits.softmax(1)
+            predicted_words = [self.sample_word(probas, black_word=word).strip() for probas, word in zip(predicted_probas, masked_words)]
+            words[masked_indices] = predicted_words
+            new_text = " ".join(words)
+        except Exception as e:
+            print(f"Something went wrong during augmentation: {e}")
+            print("Text:", text)
+            new_text = text
+        return new_text
+
+    def substitute_word(self, word):
+        # can be later improved to include only some parts of speech etc.
+        if word == self.tokenizer.sep_token:
+            return False
+        return word in self.vocab_words or word[:-1] in self.vocab_words
+
+
+# TODO: get rid of code duplication. Btw, this is a TODO that will never be done and I realize that
+class ConditionalMLMInsertionAugmenter(MLMAugmenter):
+    def __call__(self, text: str, label: str = None, fraction: float = None):
+        if self.max_fraction == 0:
+            return text
+        assert label is not None, "You  must provide a label for Conditional Augmentation"
+        words = np.array(text.split(), dtype='object')
+        max_len = self.tokenizer.model_max_length
+        fraction = fraction or self.min_fraction + (self.max_fraction - self.min_fraction)*np.random.random()
+        n_mask = max(self.min_mask, int(min(max_len, len(words)) * fraction))
+        n_mask = min(n_mask, self.max_mask)
+        max_masked_idx = min(self.tokenizer.model_max_length // 2 - n_mask,
+                             len(words) + 1)  # offset, since length might increase after tokenization
+        # end of the long text won't be augmented, but I guess we can live with that
+        masked_indices = np.sort(np.random.choice(max_masked_idx, size=n_mask, replace=False))
+        masked_words = np.insert(words, masked_indices, self.mask_token)
+        masked_text = " ".join(masked_words)
+        # Conditional input
+        masked_text = label + f" {self.tokenizer.sep_token} " + masked_text
+
+        tokenizer_output = self.tokenizer([masked_text], truncation=True)
+        input_ids = torch.tensor(tokenizer_output['input_ids']).to(self.device)
+        with torch.no_grad():
+            output = self.model(input_ids)
+            predicted_logits = output.logits[input_ids == self.mask_token_id]
+            predicted_probas = predicted_logits.softmax(1)
+
+        predicted_words = [self.sample_word(probas).strip() for probas in predicted_probas]
+
+        new_words = np.insert(words, masked_indices, predicted_words)
+        new_text = " ".join(new_words)
+        return new_text
+
+
+class ConditionalMLMSubstitutionAugmenter(MLMInsertionAugmenter):
+    def __call__(self, text: str, label: str = None, fraction: float = None):
+        if self.max_fraction == 0:
+            return text
+        assert label is not None, "You  must provide a label for Conditional Augmentation"
+        try:
+            words = np.array(text.split(), dtype='object')
+            max_len = self.tokenizer.model_max_length
+            fraction = fraction or self.min_fraction + (self.max_fraction - self.min_fraction) * np.random.random()
+            n_mask = max(self.min_mask, int(min(max_len, len(words)) * fraction))
+            n_mask = min(n_mask, self.max_mask)
+            # offset, since length might increase after tokenization
+            max_masked_idx = min(max_len // 2, len(words) + 1)
+            vocab_word_indices = [i for i, word in itertools.islice(enumerate(words), max_masked_idx)
+                                  if self.substitute_word(word)]
+            if not vocab_word_indices:
+                return text
+            n_mask = min(n_mask, len(vocab_word_indices))
+            masked_indices = np.sort(np.random.choice(vocab_word_indices, size=n_mask, replace=False))
+            masked_words = words[masked_indices]
+            words[masked_indices] = self.mask_token
+            masked_text = " ".join(words)
+            # Conditional input
+            masked_text = label + f" {self.tokenizer.sep_token} " + masked_text
 
             tokenizer_output = self.tokenizer([masked_text], truncation=True)
             input_ids = torch.tensor(tokenizer_output['input_ids']).to(self.device)
@@ -212,7 +294,7 @@ class BartAugmenter:
         self.lambda_ = lambda_
         self.num_beams = num_beams
 
-    def __call__(self, text: str, fraction: float = None):
+    def __call__(self, text: str, label: str = None, fraction: float = None):
         if self.fraction == 0:
             return text
 
@@ -261,5 +343,5 @@ class BartAugmenter:
 
 
 class NoAugmenter:
-    def __call__(self, text: str):
+    def __call__(self, text: str, label: str = None):
         return text
