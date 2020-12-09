@@ -65,6 +65,7 @@ def run_exp():
                     model = AutoModelForSequenceClassification.from_pretrained(model_name_or_path, return_dict=True,
                                                                                num_labels=config["num_labels"])
                     training_csv_path = os.path.join(ROOT_TRAINING_CSV_PATH, name, augmentation_name, f"{train_size}.csv")
+                    print("Augmenter", augmenter)
                     train_dataset, val_dataset, test_dataset = get_datasets(
                         config["dataset_name"],
                         augmenter=augmenter,

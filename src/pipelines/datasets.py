@@ -119,15 +119,18 @@ def get_datasets(dataset_name, augmenter=None, train_size=10_000, val_size=5_000
     train_val_split = dataset.train_test_split(test_size=val_size, seed=random_seed)
     # we only want to use train_size samples for training
     if training_csv_path:
+        print(f"Loading training dataset from {training_csv_path}")
         train_dataset = DatasetFromCsv(training_csv_path)
     else:
         train_dataset = train_val_split["train"].train_test_split(train_size=train_size, seed=random_seed)["train"]
     val_dataset = train_val_split["test"]
     if text_columns and type(text_columns) == list and merge_text_columns:
+        print(f"Merging text columns: {text_columns}")
         assert sep_token is not None, "Sep token has to be specified when using multiple text columns"
         train_dataset = DatasetWithMultipleTexts(train_dataset, text_columns, sep_token)
         val_dataset = DatasetWithMultipleTexts(val_dataset, text_columns, sep_token)
         test_dataset = DatasetWithMultipleTexts(test_dataset, text_columns, sep_token)
     if augmenter:
+        print(f"Creating dataset with augmentation. Augmenter: {augmenter} Augmentation probability: {augmentation_prob}")
         train_dataset = DatasetWithAugmentation(train_dataset, augmenter, augmentation_prob=augmentation_prob)
     return train_dataset, val_dataset, test_dataset
