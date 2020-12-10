@@ -162,7 +162,6 @@ class MLMSubstitutionAugmenter(MLMAugmenter):
             masked_words = words[masked_indices]
             words[masked_indices] = self.mask_token
             masked_text = " ".join(words)
-            masked_text = label + f" {self.tokenizer.sep_token} " + masked_text
 
             tokenizer_output = self.tokenizer([masked_text], truncation=True)
             input_ids = torch.tensor(tokenizer_output['input_ids']).to(self.device)
