@@ -209,8 +209,15 @@ no_augmenter_config = {
 
 # Classification model config
 
-augmentation_configs = [no_augmenter_config, swap_config, wordnet_config, mlm_insertion_config, mlm_substitution_config,
-                        finetuned_mlm_insertion_config, finetuned_mlm_insertion_config]
+augmentation_configs = [
+    # no_augmenter_config,
+    # swap_config,
+    # wordnet_config,
+    # mlm_insertion_config,
+    # mlm_substitution_config,
+    # finetuned_mlm_insertion_config,
+    finetuned_mlm_substitution_config
+]
 
 cnn_classifier_config = {
     "embedding_size": 128,
