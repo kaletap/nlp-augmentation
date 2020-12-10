@@ -99,14 +99,24 @@ for split, split_data in splits:
             text, ans_start, fail = trim_text(text, ans_start)
             ans_end = ans_start + len(ans)
 
+            context_first_part = " ".join(text[:ans_start].strip().split())
+            context_second_part = " ".join(text[ans_start + len(ans):].strip().split())
+
+            clean_ans = clean_text(ans)
+            clean_context_first_part = clean_text(context_first_part) + " "
+            clean_context_second_part = " " + clean_text(context_second_part)
+            clean_txt = clean_context_first_part + clean_ans + clean_context_second_part
+
+            ans_start = len(clean_context_first_part)
+
             if fail:
                 fail_counter += 1
             else:
                 correct_counter += 1
 
-            csv_dict["context"].append(text)
+            csv_dict["context"].append(clean_txt)
             csv_dict["question"].append(q["question"])
-            csv_dict["answers"].append(str({"answer_start": [ans_start], "text": [ans]}))
+            csv_dict["answers"].append(str({"answer_start": [ans_start], "text": [clean_ans]}))
             csv_dict["is_impossible"].append(q["is_impossible"])
 
     print(f"correct_counter {correct_counter}")
