@@ -64,7 +64,7 @@ PARAMS_LIST = [
              # (100, "qa", ("context",), {"type": "rules", "repeat": 100}),
              # (500, "qa", ("context",), {"type": "rules", "repeat": 20}),
              # (1500, "qa", ("context",), {"type": "rules", "repeat": 7}),
-             # (100, "qa", ("context",), {"type": "LM", "repeat": 100}), # 100 original and 9900 augmented
+             (100, "qa", ("context",), {"type": "LM", "repeat": 100}), # 100 original and 9900 augmented
              (500, "qa", ("context",), {"type": "LM", "repeat": 20}), # 1000 original and 9000 augmented
              (1500, "qa", ("context",), {"type": "LM", "repeat": 7}), # 5000 original and 5000 augmented
         ],
@@ -102,6 +102,6 @@ for (dataset_name, split, ds_params) in PARAMS_LIST:
         else:
             df_subset = df
             print("not trimming ds cuz sample_count: " + sample_count)
-        auged_df = data_downloading.augment_data(
+        auged_df = data_downloading.process_data(
             df_subset, task=task, aug_type=aug["type"], aug_repeat=aug["repeat"], x_cols=x_cols, max_len=max_len)
         auged_df.to_csv(f"{'-'.join(dataset_name)}_{split}_{sample_count}_aug-{aug['type']}_repeat-{aug['repeat']}.csv")
