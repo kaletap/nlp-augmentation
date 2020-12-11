@@ -169,6 +169,17 @@ finetuned_mlm_substitution_config = {
     "augmentation_prob": 0.7,
 }
 
+# using actual path to the conditional model won't be necessary if we use already saved augmented dataset
+conditional_mlm_insertion_config = {
+    "name": "contional_mlm_insertion",
+    "class": ConditionalMLMInsertionAugmenter
+}
+
+conditional_mlm_substitution_config = {
+    "name": "conditional_mlm_substitution",
+    "class": ConditionalMLMSubstitutionAugmenter
+}
+
 swap_config = {
     "name": "random_swap",
     "class": RandomWordAugmenter,
@@ -210,13 +221,13 @@ no_augmenter_config = {
 # Classification model config
 
 augmentation_configs = [
-    # no_augmenter_config,
-    # swap_config,
-    # wordnet_config,
-    # mlm_insertion_config,
-    # mlm_substitution_config,
-    # finetuned_mlm_insertion_config,
-    finetuned_mlm_substitution_config
+    no_augmenter_config,
+    swap_config,
+    wordnet_config,
+    mlm_insertion_config,
+    mlm_substitution_config,
+    finetuned_mlm_insertion_config,
+    # finetuned_mlm_substitution_config
 ]
 
 cnn_classifier_config = {
