@@ -95,6 +95,21 @@ class ConditionalDataset(Dataset):
         return row
 
 
+class TwitterDatasetFix(Dataset):
+    def __init__(self, dataset):
+        self.dataset = dataset
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, i):
+        row = self.dataset[i]
+        label = row["sentiment"]
+        label = 0 if label == 0 else 1
+        row["sentiment"] = label
+        return row
+
+
 def get_datasets(dataset_name, augmenter=None, train_size=10_000, val_size=5_000, test_size=None, augmentation_prob=0.7,
                  random_seed: int = 42, load_test=False, filter_func=None, text_columns=None, merge_text_columns=True,
                  sep_token=None, training_csv_path=None):
@@ -136,4 +151,8 @@ def get_datasets(dataset_name, augmenter=None, train_size=10_000, val_size=5_000
     if augmenter:
         print(f"Creating dataset with augmentation. Augmenter: {augmenter} Augmentation probability: {augmentation_prob}")
         train_dataset = DatasetWithAugmentation(train_dataset, augmenter, augmentation_prob=augmentation_prob)
+    if dataset_name == "sentiment140":
+        train_dataset = TwitterDatasetFix(train_dataset)
+        val_dataset = TwitterDatasetFix(val_dataset)
+        test_dataset = TwitterDatasetFix(test_dataset)
     return train_dataset, val_dataset, test_dataset
