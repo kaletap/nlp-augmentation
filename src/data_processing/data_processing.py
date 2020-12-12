@@ -11,9 +11,10 @@ def processing_from_name(df, ds_name, tokenizer, max_len):
 def squad_v2_preprocessing(df, tokenizer, max_len):
     df['answers'] = df['answers'].map(ast.literal_eval)
 
+    print(f"before preprocessing df.shape {df.shape}, {df['context'].str.split().str.len().max()}")
     params = tokenizer, max_len
     df = df.apply(partial(fixed_pre_process_squad, params=params), axis=1)
-    print(f"df.shape {df.shape}")
+    print(f"after preprocessing df.shape {df.shape}, {df['context'].str.split().str.len().max()}")
     return df
 
 

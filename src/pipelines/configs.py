@@ -25,7 +25,7 @@ cnn_dailymail_config = {
 
 squad_v2_config = {
     "ds_name": ("squad_v2",),
-    "max_len": 512,
+    "max_len": 490,
     "x_col": ("question", "context"),
     "y_col": ("tok_answer_start", "tok_answer_end"),
 }
