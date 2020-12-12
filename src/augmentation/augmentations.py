@@ -226,6 +226,8 @@ class ConditionalMLMSubstitutionAugmenter(MLMInsertionAugmenter):
         assert label is not None, "You  must provide a label for Conditional Augmentation"
         try:
             words = np.array(text.split(), dtype='object')
+            if len(words) < 3:
+                return text
             max_len = self.tokenizer.model_max_length
             fraction = fraction or self.min_fraction + (self.max_fraction - self.min_fraction) * np.random.random()
             n_mask = max(self.min_mask, int(min(max_len, len(words)) * fraction))
