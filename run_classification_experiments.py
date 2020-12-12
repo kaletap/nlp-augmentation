@@ -29,7 +29,7 @@ ROOT_MLM_DIR = root_mlm_dir[PLATFORM]
 ROOT_TRAINING_CSV_PATH = root_training_csv_path[PLATFORM]
 SAVE_DIR = "."
 # USE_FINETUNED_MODEL_FOR_CLASSIFICATION = True
-TRANSFORMER_MODEL_NAME = "albert-base-v2"
+TRANSFORMER_MODEL_NAME = "roberta-base"  # "albert-base-v2"
 
 
 def run_exp():
@@ -55,7 +55,7 @@ def run_exp():
                     augmenter = augmentation_config["class"](model_name_or_path=mlm_path, **augmentation_config["augmenter_parameters"])
                 else:
                     augmenter = augmentation_config["class"](**augmentation_config["augmenter_parameters"])
-            for USE_FINETUNED_MODEL_FOR_CLASSIFICATION in (False, ):
+            for USE_FINETUNED_MODEL_FOR_CLASSIFICATION in (True, ):
                 data_collator = DataCollator(tokenizer, text_colname="text", label_colname=config["label_colname"])
                 for train_size in config["train_sizes"]:
                     if USE_FINETUNED_MODEL_FOR_CLASSIFICATION:  # we want to load a new model for each train_size!
