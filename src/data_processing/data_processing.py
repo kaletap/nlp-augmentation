@@ -13,8 +13,6 @@ def squad_v2_preprocessing(df, tokenizer, max_len):
     df['answers'] = df['answers'].map(ast.literal_eval)
 
     params = tokenizer, max_len
-    import pdb;
-    pdb.set_trace()
     df = df.apply(partial(fixed_pre_process_squad, params=params), axis=1)
     print(f"df.shape {df.shape}")
     return df
