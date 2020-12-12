@@ -13,6 +13,8 @@ def squad_v2_preprocessing(df, tokenizer, max_len):
     df['answers'] = df['answers'].map(ast.literal_eval)
 
     params = tokenizer, max_len
+    import pdb;
+    pdb.set_trace()
     df = df.apply(partial(fixed_pre_process_squad, params=params), axis=1)
     print(f"df.shape {df.shape}")
     return df
@@ -30,6 +32,7 @@ def fixed_pre_process_squad(row, params):
     else:
         tok_input = hf_tokenizer.convert_ids_to_tokens(hf_tokenizer.encode(context, qst, **tok_kwargs))
 
+
     seq_len = len(tok_input)
     if seq_len > max_len:
         trim = (seq_len - max_len) // 2
@@ -45,6 +48,8 @@ def fixed_pre_process_squad(row, params):
                     start_idx, end_idx = idx, idx + len(tok_ans)
                     break
             except: pass
+
+    print(f"len(tok_input) {len(tok_input)}")
 
     row['tokenized_input'] = tok_input
     row['tokenized_input_len'] = len(tok_input)
