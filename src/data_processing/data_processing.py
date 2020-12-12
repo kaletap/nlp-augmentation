@@ -1,4 +1,3 @@
-import re
 import ast
 from functools import partial
 
@@ -29,7 +28,6 @@ def fixed_pre_process_squad(row, params):
         tok_input = hf_tokenizer.convert_ids_to_tokens(hf_tokenizer.encode(qst, context, **tok_kwargs))
     else:
         tok_input = hf_tokenizer.convert_ids_to_tokens(hf_tokenizer.encode(context, qst, **tok_kwargs))
-
 
     seq_len = len(tok_input)
     if seq_len > max_len:
