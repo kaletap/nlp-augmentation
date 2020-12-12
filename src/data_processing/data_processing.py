@@ -46,8 +46,6 @@ def fixed_pre_process_squad(row, params):
                     break
             except: pass
 
-    print(f"len(tok_input) {len(tok_input)}")
-
     row['tokenized_input'] = tok_input
     row['tokenized_input_len'] = len(tok_input)
     row['tok_answer_start'] = start_idx

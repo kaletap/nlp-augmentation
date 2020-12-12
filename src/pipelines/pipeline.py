@@ -142,10 +142,6 @@ class BlurrPipeline:
         df_train = pd.read_csv(train_csv_path)
         df_test = pd.read_csv(test_csv_path)
 
-        # if train_samples != "all":
-        #     df_train = df_train[:train_samples]
-        #     assert len(df_train) == train_samples, \
-        #         f"Dataset is too small to return requested train sample count {train_samples}"
         df_train["is_valid"] = False
         df_test["is_valid"] = True
         df = pd.concat([df_train, df_test])
