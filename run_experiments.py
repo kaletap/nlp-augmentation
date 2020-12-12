@@ -28,6 +28,7 @@ def run_exp(task, data_path, cache_dir, main_config):
                 og_config["augmentation"] = aug
                 config = deepcopy(og_config)
                 config = training_utils.fill_paths(task, train_samples, aug, seed, config)
+                print(f"Run experiment: train_samples {train_samples}, repeat {reps}, aug_type {aug}, seed {seed}")
                 pipe = pipe_cls.from_name(data_path=data_path, exp_parameters=config)
                 pipe.run()
 
