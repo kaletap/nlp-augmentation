@@ -98,7 +98,7 @@ qa_bert_config = {
     "opt_func": partial(optimizer.Adam, decouple_wd=True),
     "loss_func": model_qa.MultiTargetLoss,
     "metrics": (),
-    "bs": 8,
+    "bs": 4,
     "pre_config_overwrite": {},
     "train_params": {
         "all": {
