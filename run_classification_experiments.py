@@ -57,7 +57,7 @@ def run_exp():
                     augmenter = augmentation_config["class"](model_name_or_path=mlm_path, **augmentation_config["augmenter_parameters"])
                 else:
                     augmenter = augmentation_config["class"](**augmentation_config["augmenter_parameters"])
-            for USE_FINETUNED_MODEL_FOR_CLASSIFICATION in (True, ):
+            for USE_FINETUNED_MODEL_FOR_CLASSIFICATION in (False, True):
                 data_collator = DataCollator(tokenizer, text_colname="text", label_colname=config["label_colname"])
                 for train_size in config["train_sizes"]:
                     for _ in range(N_EXPERIMENTS):
