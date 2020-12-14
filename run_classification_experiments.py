@@ -38,29 +38,29 @@ def run_exp():
     tokenizer = AutoTokenizer.from_pretrained(TRANSFORMER_MODEL_NAME, use_fast=False)
 
     results_df = pd.DataFrame(columns=["dataset", "augmentation", "training_size", "accuracy", "finetuned_clf"])
-    for _ in range(N_EXPERIMENTS):
-        for name, config in dataset_configs.items():
-            print("Dataset:", name, "config:", config)
-            mlm_relative_path = config.get("mlm_relative_path", None)
-            for augmentation_config in augmentation_configs:
-                print("Augmentation config:", augmentation_config)
-                augmentation_name = augmentation_config["name"]
-                if ROOT_TRAINING_CSV_PATH:  # we won't use augmenter since we are loading augmented data
-                    augmenter = None
+    for name, config in dataset_configs.items():
+        print("Dataset:", name, "config:", config)
+        mlm_relative_path = config.get("mlm_relative_path", None)
+        for augmentation_config in augmentation_configs:
+            print("Augmentation config:", augmentation_config)
+            augmentation_name = augmentation_config["name"]
+            if ROOT_TRAINING_CSV_PATH:  # we won't use augmenter since we are loading augmented data
+                augmenter = None
+            else:
+                use_finetuned = augmentation_config.get("use_finetuned", None)
+                if use_finetuned and not mlm_relative_path:
+                    warnings.warn(f"You are asking to use finetuned model for dataset {name} but do not provide path to the"
+                                  f"pretrained model")
+                if use_finetuned and mlm_relative_path:
+                    mlm_path = os.path.join(ROOT_MLM_DIR, mlm_relative_path)
+                    print(f"Loading model for augmentation from {mlm_path}")
+                    augmenter = augmentation_config["class"](model_name_or_path=mlm_path, **augmentation_config["augmenter_parameters"])
                 else:
-                    use_finetuned = augmentation_config.get("use_finetuned", None)
-                    if use_finetuned and not mlm_relative_path:
-                        warnings.warn(f"You are asking to use finetuned model for dataset {name} but do not provide path to the"
-                                      f"pretrained model")
-                    if use_finetuned and mlm_relative_path:
-                        mlm_path = os.path.join(ROOT_MLM_DIR, mlm_relative_path)
-                        print(f"Loading model for augmentation from {mlm_path}")
-                        augmenter = augmentation_config["class"](model_name_or_path=mlm_path, **augmentation_config["augmenter_parameters"])
-                    else:
-                        augmenter = augmentation_config["class"](**augmentation_config["augmenter_parameters"])
-                for USE_FINETUNED_MODEL_FOR_CLASSIFICATION in (False, True):
-                    data_collator = DataCollator(tokenizer, text_colname="text", label_colname=config["label_colname"])
-                    for train_size in config["train_sizes"]:
+                    augmenter = augmentation_config["class"](**augmentation_config["augmenter_parameters"])
+            for USE_FINETUNED_MODEL_FOR_CLASSIFICATION in (False, True):
+                data_collator = DataCollator(tokenizer, text_colname="text", label_colname=config["label_colname"])
+                for train_size in config["train_sizes"]:
+                    for _ in range(N_EXPERIMENTS):
                         if USE_FINETUNED_MODEL_FOR_CLASSIFICATION:  # we want to load a new model for each train_size!
                             model_name_or_path = os.path.join(ROOT_MLM_DIR, mlm_relative_path)
                             print(f"Loading model for classification from {model_name_or_path}")
