@@ -124,7 +124,7 @@ common_config = {
 }
 
 experiments_setup = {
-    "train_samples": ((500, 1), (500, 2), (500, 5), (500, 10), (500, 20)), # , (100, 100), (1500, 7),  #  # (org_smpl_count, aug_repeat)
+    "train_samples": ((500, 2), (500, 5), (500, 10), (500, 20)), # , (100, 100), (1500, 7),  #  # (org_smpl_count, aug_repeat)
     "augmentations": ("no_aug", "rules", "LM"),# "vae", "rules", "style_transfer"],
     "seeds": (9,),# 9, 11, 21, 37]
     "tasks": {
