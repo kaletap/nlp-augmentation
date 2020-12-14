@@ -16,7 +16,7 @@ ag_news_config = {
     "eval_batch_size": 8,
     "gradient_accumulation_steps": 2,
     "metrics_function": compute_multiclass_metrics,
-    "train_sizes": [1000],
+    "train_sizes": [20, 100],
     "label_map": {
         0: "World",
         1: "Sports",
@@ -79,7 +79,7 @@ twitter_config = {
     "eval_batch_size": 16,
     "gradient_accumulation_steps": 1,
     "metrics_function": compute_binary_metrics,
-    "train_sizes": [1000],
+    "train_sizes": [20, 100],
     "label_map": {
         0: "negative",
         1: "positive"
@@ -99,7 +99,7 @@ yelp_config = {
     "eval_batch_size": 8,
     "gradient_accumulation_steps": 2,
     "metrics_function": compute_binary_metrics,
-    "train_sizes": [1000],
+    "train_sizes": [20],
     "label_map": {
         0: "negative",
         1: "positive"
@@ -107,10 +107,10 @@ yelp_config = {
 }
 
 dataset_configs = {
-    "ag_news": ag_news_config,
+    # "ag_news": ag_news_config,
     # "imdb": imdb_config,
     # "snli": snli_config,
-    "twitter": twitter_config,
+    # "twitter": twitter_config,
     "yelp": yelp_config
 }
 
@@ -223,15 +223,15 @@ no_augmenter_config = {
 # Classification model config
 
 augmentation_configs = [
-    # no_augmenter_config,
-    # swap_config,
-    # wordnet_config,
-    # mlm_insertion_config,
-    # mlm_substitution_config,
-    # finetuned_mlm_insertion_config,
-    # finetuned_mlm_substitution_config,
-    conditional_mlm_insertion_config,
-    conditional_mlm_substitution_config
+    no_augmenter_config,
+    swap_config,
+    wordnet_config,
+    mlm_insertion_config,
+    mlm_substitution_config,
+    finetuned_mlm_insertion_config,
+    finetuned_mlm_substitution_config,
+    # conditional_mlm_insertion_config,
+    # conditional_mlm_substitution_config
 ]
 
 cnn_classifier_config = {
