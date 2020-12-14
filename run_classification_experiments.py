@@ -30,7 +30,7 @@ ROOT_TRAINING_CSV_PATH = root_training_csv_path[PLATFORM]
 SAVE_DIR = "."
 # USE_FINETUNED_MODEL_FOR_CLASSIFICATION = True
 TRANSFORMER_MODEL_NAME = "roberta-base"  # "albert-base-v2"
-N_EXPERIMENTS = 3
+N_EXPERIMENTS = 1
 
 
 # TODO: reorganize this code into neat functions
