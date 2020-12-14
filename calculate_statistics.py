@@ -9,9 +9,9 @@ from src.pipelines import configs
 from src.training_utils import training_utils
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--task", type=str, default="qa",
+parser.add_argument("--task", type=str, default="qa_covid",
                     choices=list(configs.experiments_setup["tasks"].keys()), help="type of task")
-parser.add_argument("--data_path", type=str, default="./data/squad_v2_results/aug_method_comparision",
+parser.add_argument("--data_path", type=str, default="./data/covid_squad_results/aug_method_comparision",
                     help="path to folder with data")
 parser.add_argument("--save_path", type=str, default="qa_results.csv",
                     help="path to save results")
@@ -19,11 +19,11 @@ args = parser.parse_args()
 
 
 experiments_setup = {
-    "ds_name": ("squad_v2",),
-    "task": {"qa": ("valid_loss", "exact_match", "f1"), "summarization": ("valid_loss", "rouge_1", "rouge_2", "rouge_L")},
-    "train_samples": ((100, 100), (1000, 10), (5000, 2)),
+    "ds_name": ("covid_squad",),
+    "task": {"qa_covid": ("valid_loss", "exact_match", "f1"), "summarization": ("valid_loss", "rouge_1", "rouge_2", "rouge_L")},
+    "train_samples": ((100, 100), (500, 20), (1500, 7)),
     "augmentations": ("rules", "no_aug", "LM"),
-    "seeds": (9, 21, 37),
+    "seeds": (9, ),
     "pretrained_model_name": "bert-large-uncased-whole-word-masking-finetuned-squad",
     "metrics_save_paths":
         "metrics_{task}_ds-{dataset}_model-{model}_train_size-{train_samples}_aug-{aug}_repeat-{repeat}_seed-{seed}.csv",
