@@ -52,7 +52,9 @@ class CnnClassifier(nn.Module):
         self.pool_4 = nn.MaxPool1d(self.kernel_4, self.stride)
 
         # Fully connected layer definition
-        self.fc = nn.Linear(self.in_features_fc(), params.num_labels)
+        hidden_size = 250
+        self.fc1 = nn.Linear(self.in_features_fc(), hidden_size)
+        self.fc2 = nn.Linear(hidden_size, params.num_labels)
 
         # Loss
         self.loss_fn = nn.CrossEntropyLoss()
@@ -86,7 +88,9 @@ class CnnClassifier(nn.Module):
         union = union.reshape(union.shape[0], -1)
 
         # The "flattened" vector is passed through a fully connected layer
-        out = self.fc(union)
+        out = self.fc1(union)
+        out = torch.relu(out)
+        out = self.fc2(out)
 
         loss = self.loss_fn(out, y)
 
