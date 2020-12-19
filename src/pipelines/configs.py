@@ -125,7 +125,7 @@ common_config = {
 
 experiments_setup = {
     "train_samples": ((500, 500), (500, 1000), (500, 2500), (500, 5000), (500, 10000)), # , (100, 100), (1500, 7),  #  # (org_smpl_count, aug_repeat)
-    "augmentations": ("no_aug", "rules", "LM"),# "vae", "rules", "style_transfer"],
+    "augmentations": ("LM", ),# "vae", "rules", "style_transfer"], # "no_aug", "rules",
     "seeds": (9,),# 9, 11, 21, 37]
     "tasks": {
         "summarization": ((pipeline.SummarizationPipeline, {**summary_bart_config, **cnn_dailymail_config, **common_config})),
