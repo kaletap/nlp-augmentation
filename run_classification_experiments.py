@@ -27,6 +27,7 @@ PLATFORM = "kaggle"
 ROOT_OUTPUT_DIR = root_output_dir[PLATFORM]
 ROOT_MLM_DIR = root_mlm_dir[PLATFORM]
 ROOT_TRAINING_CSV_PATH = root_training_csv_path[PLATFORM]
+USE_SAVED_TRAINING_DATA = False
 SAVE_DIR = "."
 # USE_FINETUNED_MODEL_FOR_CLASSIFICATION = True
 TRANSFORMER_MODEL_NAME = "roberta-base"  # "albert-base-v2"
@@ -57,7 +58,7 @@ def run_exp():
                     augmenter = augmentation_config["class"](model_name_or_path=mlm_path, **augmentation_config["augmenter_parameters"])
                 else:
                     augmenter = augmentation_config["class"](**augmentation_config["augmenter_parameters"])
-            for USE_FINETUNED_MODEL_FOR_CLASSIFICATION in (False, True):
+            for USE_FINETUNED_MODEL_FOR_CLASSIFICATION in (True, False):
                 data_collator = DataCollator(tokenizer, text_colname="text", label_colname=config["label_colname"])
                 for train_size in config["train_sizes"]:
                     for _ in range(N_EXPERIMENTS):
@@ -68,7 +69,10 @@ def run_exp():
                             model_name_or_path = TRANSFORMER_MODEL_NAME
                         model = AutoModelForSequenceClassification.from_pretrained(model_name_or_path, return_dict=True,
                                                                                    num_labels=config["num_labels"])
-                        training_csv_path = os.path.join(ROOT_TRAINING_CSV_PATH, name, augmentation_name, f"{train_size}.csv")
+                        if USE_SAVED_TRAINING_DATA:
+                            training_csv_path = os.path.join(ROOT_TRAINING_CSV_PATH, name, augmentation_name, f"{train_size}.csv")
+                        else:
+                            training_csv_path = None
                         print("Augmenter", augmenter)
                         train_dataset, val_dataset, test_dataset = get_datasets(
                             config["dataset_name"],
@@ -97,10 +101,10 @@ def run_exp():
                                 1000: 7,
                                 2_500: 6,
                                 10_000: 6,
-                                100_000: 3
+                                100_000: 5
                             }.get(train_size, 6)
                             if train_size > 50_000:
-                                num_train_epochs = 3
+                                num_train_epochs = 5
 
                         output_dir = os.path.join(ROOT_OUTPUT_DIR, f'{name}_{augmentation_config["name"]}_train_size_{train_size}')
                         # https://huggingface.co/transformers/main_classes/trainer.html#trainingarguments
